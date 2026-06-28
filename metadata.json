@@ -1,0 +1,6 @@
+{
+  "name": "Space Design Workstation",
+  "description": "A high-fidelity space and exhibition design portfolio designed as an interactive CAD workspace.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
