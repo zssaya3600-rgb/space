@@ -257,6 +257,38 @@ export default function App() {
 
   const [uploadError, setUploadError] = useState<string | null>(null);
   const [linkError, setLinkError] = useState<string | null>(null);
+  const [failedImages, setFailedImages] = useState<Record<string, boolean>>({});
+  const [pathInputWarning, setPathInputWarning] = useState<string | null>(null);
+  const [manualPathInput, setManualPathInput] = useState("");
+
+  useEffect(() => {
+    const val = manualPathInput.trim();
+    if (val === "") {
+      setPathInputWarning(null);
+      return;
+    }
+    if (!val.startsWith("http") && !val.startsWith("data:") && !val.startsWith("/images/")) {
+      setPathInputWarning("경고: 로컬 이미지 경로는 반드시 /images/ 로 시작해야 브라우저에서 정상 표시됩니다 (예: /images/파일명.png).");
+    } else {
+      setPathInputWarning(null);
+    }
+  }, [manualPathInput]);
+
+  const handleImageError = (src: string) => {
+    if (src) {
+      setFailedImages(prev => ({ ...prev, [src]: true }));
+    }
+  };
+
+  const handleImageLoad = (src: string) => {
+    if (src && failedImages[src]) {
+      setFailedImages(prev => {
+        const updated = { ...prev };
+        delete updated[src];
+        return updated;
+      });
+    }
+  };
 
   // Helper to ensure URL starts with http:// or https://
   const ensureAbsoluteUrl = (url: string | undefined): string => {
@@ -1212,12 +1244,21 @@ export default function App() {
 
                       {cat.image ? (
                         <div className="relative w-full h-full flex items-center justify-center">
-                          <img 
-                            src={resolveImageSrc(cat.image)} 
-                            alt={cat.title} 
-                            className="w-full h-full object-contain select-none"
-                            referrerPolicy="no-referrer"
-                          />
+                          {failedImages[cat.image] ? (
+                            <div className="w-full h-full flex flex-col items-center justify-center bg-rose-950/30 border border-rose-500/30 text-rose-300 text-[8px] leading-tight text-center p-1 font-mono" title="이미지를 찾을 수 없습니다.">
+                              <AlertCircle className="w-4 h-4 text-rose-400 mb-0.5" />
+                              <span className="truncate max-w-full text-[8px]">ERR</span>
+                            </div>
+                          ) : (
+                            <img 
+                              src={resolveImageSrc(cat.image)} 
+                              alt={cat.title} 
+                              className="w-full h-full object-contain select-none"
+                              referrerPolicy="no-referrer"
+                              onError={() => handleImageError(cat.image)}
+                              onLoad={() => handleImageLoad(cat.image)}
+                            />
+                          )}
                           {/* Hover change overlay indicator */}
                           <div className="absolute inset-0 bg-black/60 opacity-0 group-hover/upload:opacity-100 flex items-center justify-center transition-opacity duration-200">
                             <span className="text-[8px] font-mono text-sky-400 font-bold uppercase tracking-widest">
@@ -1683,12 +1724,35 @@ export default function App() {
                                   REF: {activeImageIndex + 1} / {uploadedImages.length}
                                 </div>
 
-                                <img 
-                                  src={resolveImageSrc(uploadedImages[activeImageIndex]) || ""} 
-                                  alt={`${selectedProject?.title || ""} rendering`}
-                                  referrerPolicy="no-referrer"
-                                  className="w-full h-full object-cover select-none"
-                                />
+                                {failedImages[uploadedImages[activeImageIndex]] ? (
+                                  <div className="w-full h-full flex flex-col items-center justify-center p-6 bg-rose-950/20 text-center font-mono select-none">
+                                    <AlertCircle className="w-8 h-8 text-rose-500 mb-2 animate-pulse" />
+                                    <p className="text-xs text-rose-300 font-bold">이미지를 찾을 수 없습니다.</p>
+                                    <p className="text-[10px] text-zinc-400 mt-1">public/images 폴더와 파일명을 확인해주세요.</p>
+                                    <div className="mt-3 bg-zinc-950/90 border border-zinc-800 rounded px-2.5 py-1.5 flex items-center gap-2 max-w-[90%] overflow-hidden">
+                                      <span className="text-[9px] text-zinc-500 truncate select-all">{uploadedImages[activeImageIndex]}</span>
+                                      <button
+                                        type="button"
+                                        onClick={() => {
+                                          navigator.clipboard.writeText(uploadedImages[activeImageIndex]);
+                                          triggerNotification("IMAGE PATH COPIED.");
+                                        }}
+                                        className="px-1.5 py-0.5 rounded bg-zinc-900 hover:bg-zinc-850 border border-zinc-800 text-zinc-400 hover:text-white transition-all text-[8px] shrink-0"
+                                      >
+                                        COPY PATH
+                                      </button>
+                                    </div>
+                                  </div>
+                                ) : (
+                                  <img 
+                                    src={resolveImageSrc(uploadedImages[activeImageIndex]) || ""} 
+                                    alt={`${selectedProject?.title || ""} rendering`}
+                                    referrerPolicy="no-referrer"
+                                    className="w-full h-full object-cover select-none"
+                                    onError={() => handleImageError(uploadedImages[activeImageIndex])}
+                                    onLoad={() => handleImageLoad(uploadedImages[activeImageIndex])}
+                                  />
+                                )}
 
                                 {/* Prev / Next buttons inside viewport */}
                                 {uploadedImages.length > 1 && (
@@ -1724,12 +1788,21 @@ export default function App() {
                                           : "border-zinc-800 hover:border-sky-500/50"
                                       }`}
                                     >
-                                      <img 
-                                        src={resolveImageSrc(img)} 
-                                        alt="thumbnail" 
-                                        referrerPolicy="no-referrer"
-                                        className="w-full h-full object-cover" 
-                                      />
+                                      {failedImages[img] ? (
+                                        <div className="w-full h-full flex flex-col items-center justify-center bg-rose-950/30 border border-rose-500/30 text-rose-300 text-[8px] leading-tight text-center p-1 font-mono" title="이미지를 찾을 수 없습니다.">
+                                          <AlertCircle className="w-3.5 h-3.5 text-rose-400 mb-0.5" />
+                                          <span className="truncate max-w-full text-[7px]">ERR</span>
+                                        </div>
+                                      ) : (
+                                        <img 
+                                          src={resolveImageSrc(img)} 
+                                          alt="thumbnail" 
+                                          referrerPolicy="no-referrer"
+                                          className="w-full h-full object-cover" 
+                                          onError={() => handleImageError(img)}
+                                          onLoad={() => handleImageLoad(img)}
+                                        />
+                                      )}
                                     </button>
                                   ))}
                                 </div>
@@ -2403,6 +2476,47 @@ export default function App() {
                   </div>
                 </div>
 
+                {/* Image Storage & Environment Guide Box */}
+                <div className="p-4 rounded-lg bg-[#06080c] border border-sky-950/45 space-y-2.5 font-sans mt-3">
+                  <div className="flex items-center gap-1.5 text-sky-400 font-bold uppercase tracking-wider text-[10px]">
+                    <HelpCircle className="w-4 h-4 text-sky-400" />
+                    <span>IMAGE STORAGE & RECOVERY GUIDE (이미지 연동 안내 가이드)</span>
+                  </div>
+                  
+                  <div className="space-y-2 text-[10.5px] text-zinc-400 leading-relaxed">
+                    <p>
+                      * 현재 이 포트폴리오 사이트는 이미지를 <code className="bg-zinc-900 px-1.5 py-0.5 rounded text-sky-400 font-mono text-[10px]">/images/파일명.png</code> 형태의 상대 경로로 저장하고 있습니다. 
+                      따라서 <strong>실제 이미지 파일은 반드시 프로젝트의 <code className="bg-zinc-900 px-1.5 py-0.5 rounded text-zinc-300 font-mono text-[10px]">public/images</code> 폴더 안에 업로드</strong>되어 존재해야만 화면에 최종 정상 출력됩니다.
+                    </p>
+                    <p className="text-sky-300 font-semibold bg-sky-950/20 p-2 rounded border border-sky-900/20 leading-snug">
+                      “이미지가 보이지 않는 경우, 실제 이미지 파일을 VS Code 프로젝트의 public/images 폴더에 넣고 /images/파일명.png 형식으로 입력해주세요.”
+                    </p>
+                    
+                    {/* Examples and Best Practices */}
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5 bg-black/40 p-2.5 rounded border border-zinc-900 text-[10px] font-mono">
+                      <div>
+                        <span className="text-zinc-500 block text-[9px] uppercase">1. 로컬 실제 파일 경로 (VS Code)</span>
+                        <span className="text-zinc-300 font-bold">public/images/atlas_main_01.png</span>
+                      </div>
+                      <div>
+                        <span className="text-zinc-500 block text-[9px] uppercase">2. 사이트 입력 경로 (APP PATH)</span>
+                        <span className="text-sky-400 font-bold">/images/atlas_main_01.png</span>
+                      </div>
+                    </div>
+
+                    <div className="pt-1.5 border-t border-zinc-900/50 space-y-1 text-[9.5px] text-zinc-500">
+                      <p className="flex items-start gap-1">
+                        <span className="text-sky-500 font-bold mt-0.5">●</span>
+                        <span><strong>파일명 권장 규칙:</strong> 이미지 파일명은 <strong>영문 소문자, 숫자, 언더바(_)</strong> 사용을 강력히 권장합니다. (공백이나 한글, 특수문자 등은 웹 표준 브라우저에서 경로 인코딩 문제로 깨져 보일 수 있습니다.)</span>
+                      </p>
+                      <p className="flex items-start gap-1">
+                        <span className="text-sky-500 font-bold mt-0.5">●</span>
+                        <span><strong>브라우저 저장 팁:</strong> 내부 데이터베이스(localStorage)에는 이미지 파일 원본 자체가 아닌 <strong>문자열 경로만 저장</strong>하여 브라우저 용량 낭비 및 속도 저하를 안전하게 원천 차단합니다.</span>
+                      </p>
+                    </div>
+                  </div>
+                </div>
+
                 {/* Manual Path Input Area */}
                 <div className="mt-3 space-y-1">
                   <label className="block text-zinc-500 text-[9px] uppercase tracking-wider">또는 이미지 URL/경로 직접 입력</label>
@@ -2410,19 +2524,20 @@ export default function App() {
                     <input
                       type="text"
                       id="manual-image-url-input"
+                      value={manualPathInput}
+                      onChange={(e) => setManualPathInput(e.target.value)}
                       placeholder="예: /images/파일명.png 또는 https://images.unsplash.com/..."
                       className="flex-1 bg-zinc-950 border border-zinc-800 focus:border-sky-400 p-2 rounded text-zinc-200 focus:outline-none text-[11px]"
                       onKeyDown={(e) => {
                         if (e.key === 'Enter') {
                           e.preventDefault();
-                          const inputEl = document.getElementById("manual-image-url-input") as HTMLInputElement;
-                          if (inputEl && inputEl.value.trim()) {
-                            let val = inputEl.value.trim();
+                          if (manualPathInput.trim()) {
+                            let val = manualPathInput.trim();
                             if (!val.startsWith("http") && !val.startsWith("data:") && !val.startsWith("/")) {
                               val = "/" + val;
                             }
                             setFormImages(prev => [...prev, val]);
-                            inputEl.value = "";
+                            setManualPathInput("");
                             triggerNotification("CUSTOM IMAGE PATH ADDED.");
                           }
                         }
@@ -2431,14 +2546,13 @@ export default function App() {
                     <button
                       type="button"
                       onClick={() => {
-                        const inputEl = document.getElementById("manual-image-url-input") as HTMLInputElement;
-                        if (inputEl && inputEl.value.trim()) {
-                          let val = inputEl.value.trim();
+                        if (manualPathInput.trim()) {
+                          let val = manualPathInput.trim();
                           if (!val.startsWith("http") && !val.startsWith("data:") && !val.startsWith("/")) {
                             val = "/" + val;
                           }
                           setFormImages(prev => [...prev, val]);
-                          inputEl.value = "";
+                          setManualPathInput("");
                           triggerNotification("CUSTOM IMAGE PATH ADDED.");
                         }
                       }}
@@ -2447,6 +2561,14 @@ export default function App() {
                       경로 추가
                     </button>
                   </div>
+
+                  {/* Reactive warning for paths not starting with /images/ */}
+                  {pathInputWarning && (
+                    <div className="mt-1.5 p-2 bg-amber-950/30 border border-amber-500/35 rounded text-amber-300 text-[10px] font-sans flex items-start gap-1.5 leading-snug">
+                      <AlertCircle className="w-3.5 h-3.5 text-amber-400 shrink-0 mt-0.5" />
+                      <span>{pathInputWarning}</span>
+                    </div>
+                  )}
                 </div>
 
                 {/* On-screen error message display */}
@@ -2466,30 +2588,65 @@ export default function App() {
 
                 {/* Previews wrapper if files exist */}
                 {formImages.length > 0 && (
-                  <div className="mt-4 space-y-1.5">
-                    <p className="text-[9px] text-zinc-500 font-mono">ATTACHED RENDERS ({formImages.length} IMAGES):</p>
-                    <div className="flex flex-wrap gap-2">
-                      {formImages.map((img, idx) => (
-                        <div key={idx} className="relative w-16 aspect-[16/9] rounded border border-zinc-800 overflow-hidden group">
-                          <img
-                            src={resolveImageSrc(img)}
-                            alt="preview"
-                            className="w-full h-full object-cover"
-                            referrerPolicy="no-referrer"
-                          />
-                          <button
-                            type="button"
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              removeFormImage(idx);
-                            }}
-                            className="absolute inset-0 bg-black/80 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity text-rose-500 hover:text-rose-400"
-                            title="Remove image"
-                          >
-                            <Trash2 className="w-3.5 h-3.5" />
-                          </button>
-                        </div>
-                      ))}
+                  <div className="mt-4 space-y-3">
+                    <div>
+                      <p className="text-[9px] text-zinc-500 font-mono uppercase tracking-wider mb-1.5">ATTACHED RENDERS ({formImages.length} IMAGES):</p>
+                      <div className="flex flex-wrap gap-2">
+                        {formImages.map((img, idx) => (
+                          <div key={idx} className="relative w-16 aspect-[16/9] rounded border border-zinc-800 overflow-hidden group">
+                            {failedImages[img] ? (
+                              <div className="w-full h-full flex flex-col items-center justify-center bg-rose-950/30 text-rose-300 text-[7px] font-mono leading-none p-0.5" title="이미지를 찾을 수 없습니다.">
+                                <AlertCircle className="w-3.5 h-3.5 text-rose-400 mb-0.5" />
+                                <span>ERR</span>
+                              </div>
+                            ) : (
+                              <img
+                                src={resolveImageSrc(img)}
+                                alt="preview"
+                                className="w-full h-full object-cover"
+                                referrerPolicy="no-referrer"
+                                onError={() => handleImageError(img)}
+                                onLoad={() => handleImageLoad(img)}
+                              />
+                            )}
+                            <button
+                              type="button"
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                removeFormImage(idx);
+                              }}
+                              className="absolute inset-0 bg-black/80 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity text-rose-500 hover:text-rose-400"
+                              title="Remove image"
+                            >
+                              <Trash2 className="w-3.5 h-3.5" />
+                            </button>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+
+                    {/* Path copy/view list */}
+                    <div className="p-3 rounded bg-black/40 border border-zinc-900 space-y-2">
+                      <span className="block text-[9px] text-sky-400 font-bold uppercase tracking-wider font-mono">
+                        현재 저장된 이미지 경로 목록 (CLICK TO COPY)
+                      </span>
+                      <div className="space-y-1.5 max-h-[140px] overflow-y-auto pr-1">
+                        {formImages.map((img, idx) => (
+                          <div key={idx} className="flex items-center justify-between gap-2 p-1.5 bg-zinc-950 rounded border border-zinc-900/60 font-mono text-[10px]">
+                            <span className="truncate flex-1 text-zinc-400 select-all text-[9.5px]">{img}</span>
+                            <button
+                              type="button"
+                              onClick={() => {
+                                navigator.clipboard.writeText(img);
+                                triggerNotification("IMAGE PATH COPIED.");
+                              }}
+                              className="px-2 py-0.5 bg-sky-950 hover:bg-sky-900 border border-sky-800/40 text-sky-300 rounded text-[8px] font-bold tracking-wider uppercase shrink-0 transition-all"
+                            >
+                              COPY
+                            </button>
+                          </div>
+                        ))}
+                      </div>
                     </div>
                   </div>
                 )}
