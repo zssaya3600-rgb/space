@@ -27,7 +27,7 @@ export const defaultProjects: Project[] = [
     materialLighting: { materials: ["Steel", "Tempered Glass", "Concrete"], lighting: ["4000K Line LED"], description: "구조미를 살린 산업용 금속 프레임과 매립 조명" },
     renderingUrl: "atlas_01_rendering",
     finalImageUrl: "atlas_01_final",
-    images: []
+    images: ["https://images.unsplash.com/photo-1530836369250-ef72a3f5cda8?q=80&w=1200&auto=format&fit=crop", "https://images.unsplash.com/photo-1466692476868-aef1dfb1e735?q=80&w=1200&auto=format&fit=crop"]
   },
   {
     id: "atlas-02",
@@ -189,7 +189,7 @@ export const defaultProjects: Project[] = [
     materialLighting: { materials: ["Acoustic Plasterboard"], lighting: ["Diffuse Ceiling Light"], description: "작품 집중에 방해 없는 균일한 무지향성 확산광" },
     renderingUrl: "exres_01_rendering",
     finalImageUrl: "exres_01_final",
-    images: []
+    images: ["https://images.unsplash.com/photo-1554907984-15263bfd63bd?q=80&w=1200&auto=format&fit=crop", "https://images.unsplash.com/photo-1491156855053-9cdff72c7f85?q=80&w=1200&auto=format&fit=crop"]
   },
   {
     id: "exres-02",
@@ -271,7 +271,7 @@ export const defaultProjects: Project[] = [
     materialLighting: { materials: ["Carpet Tile", "Birch Plywood"], lighting: ["5000K Flat LED Panel"], description: "눈의 피로가 덜한 완전 주백색 주백광 조명" },
     renderingUrl: "com_01_rendering",
     finalImageUrl: "com_01_final",
-    images: []
+    images: ["https://images.unsplash.com/photo-1554118811-1e0d58224f24?q=80&w=1200&auto=format&fit=crop", "https://images.unsplash.com/photo-1497366811353-6870744d04b2?q=80&w=1200&auto=format&fit=crop"]
   },
   {
     id: "com-02",
@@ -321,7 +321,7 @@ export const defaultProjects: Project[] = [
     materialLighting: { materials: ["Travertine Stone", "Walnut Panel"], lighting: ["Lutron Dimming Control System"], description: "시간 및 활동 유형별 감성 웰컴 라이팅 기획" },
     renderingUrl: "res_01_rendering",
     finalImageUrl: "res_01_final",
-    images: []
+    images: ["https://images.unsplash.com/photo-1618221195710-dd6b41faaea6?q=80&w=1200&auto=format&fit=crop", "https://images.unsplash.com/photo-1502005229762-fc1b2d812ca5?q=80&w=1200&auto=format&fit=crop"]
   },
   {
     id: "res-02",
@@ -371,7 +371,7 @@ export const defaultProjects: Project[] = [
     materialLighting: { materials: ["Anodized Silver Louvers", "Concrete Pillar"], lighting: ["3000K External Uplighters"], description: "하향 기둥 전용 외부 건축 조명과 스카이 HDRI" },
     renderingUrl: "vis_01_rendering",
     finalImageUrl: "vis_01_final",
-    images: []
+    images: ["https://images.unsplash.com/photo-1600585154340-be6161a56a0c?q=80&w=1200&auto=format&fit=crop", "https://images.unsplash.com/photo-1600607687939-ce8a6c25118c?q=80&w=1200&auto=format&fit=crop"]
   },
   {
     id: "vis-02",
@@ -453,7 +453,7 @@ export const defaultProjects: Project[] = [
     materialLighting: { materials: ["Carbon Lead", "Warm Tone Paper"], lighting: ["Desk Ambient Light"], description: "수정 가능한 상태의 드래프팅 무드" },
     renderingUrl: "proc_01_rendering",
     finalImageUrl: "proc_01_final",
-    images: []
+    images: ["https://images.unsplash.com/photo-1503387762-592deb58ef4e?q=80&w=1200&auto=format&fit=crop", "https://images.unsplash.com/photo-1513694203232-719a280e022f?q=80&w=1200&auto=format&fit=crop"]
   },
   {
     id: "proc-02",
@@ -551,7 +551,7 @@ export const defaultProjects: Project[] = [
     materialLighting: { materials: ["Weathered Brick", "Anodized Green Aluminium"], lighting: ["Warm Spotlights combined with Grow LED"], description: "도시 재생 흔적을 보존하는 극적 연출 라이팅" },
     renderingUrl: "comp_01_rendering",
     finalImageUrl: "comp_01_final",
-    images: []
+    images: ["https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?q=80&w=1200&auto=format&fit=crop", "https://images.unsplash.com/photo-1511556532299-8f662fc26c06?q=80&w=1200&auto=format&fit=crop"]
   },
   {
     id: "comp-02",
@@ -601,7 +601,7 @@ export const defaultProjects: Project[] = [
     materialLighting: { materials: ["Digital Text Node Chart"], lighting: ["Pure Screen Backlight"], description: "시각 자극을 줄인 미니멀 텍스트 디스플레이" },
     renderingUrl: "aiwf_01_rendering",
     finalImageUrl: "aiwf_01_final",
-    images: []
+    images: ["https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?q=80&w=1200&auto=format&fit=crop", "https://images.unsplash.com/photo-1618005198143-e5283b519a7f?q=80&w=1200&auto=format&fit=crop"]
   },
   {
     id: "aiwf-02",

@@ -31,7 +31,8 @@ import {
   ChevronRight,
   ChevronLeft,
   Eye,
-  GraduationCap
+  GraduationCap,
+  AlertCircle
 } from "lucide-react";
 import { defaultCategories, defaultProjects } from "./data";
 import { Category, Project } from "./types";
@@ -228,6 +229,56 @@ export default function App() {
   const [activeImageIndex, setActiveImageIndex] = useState(0);
   const [isDetailDragging, setIsDetailDragging] = useState(false);
 
+  // Session-level preview state mapping for uploaded files (maps /images/filename.png to transient blob or base64)
+  const [sessionPreviews, setSessionPreviews] = useState<Record<string, string>>(() => {
+    try {
+      const saved = sessionStorage.getItem("session_image_previews");
+      return saved ? JSON.parse(saved) : {};
+    } catch {
+      return {};
+    }
+  });
+
+  const saveSessionPreviews = (updated: Record<string, string>) => {
+    setSessionPreviews(updated);
+    try {
+      sessionStorage.setItem("session_image_previews", JSON.stringify(updated));
+    } catch (e) {
+      console.warn("sessionStorage storage limit exceeded", e);
+    }
+  };
+
+  const [uploadError, setUploadError] = useState<string | null>(null);
+
+  // Helper to sanitize filenames to prevent encoding or space issues
+  const sanitizeFilename = (filename: string): string => {
+    const lastDotIdx = filename.lastIndexOf('.');
+    const ext = lastDotIdx !== -1 ? filename.slice(lastDotIdx).toLowerCase() : '.png';
+    let nameWithoutExt = lastDotIdx !== -1 ? filename.slice(0, lastDotIdx) : filename;
+    
+    // Clean spaces, brackets, special characters
+    let cleanName = nameWithoutExt
+      .replace(/[\s()\[\]{}]/g, "_")
+      .replace(/[^a-zA-Z0-9ㄱ-ㅎㅏ-ㅣ가-힣_]/g, "") // Keep alphanumeric, Korean and underscores
+      .replace(/__+/g, "_")
+      .replace(/^_+|_+$/g, "");
+
+    if (!cleanName) {
+      cleanName = "uploaded_image_" + Math.floor(Math.random() * 1000);
+    }
+
+    return `${cleanName}${ext}`;
+  };
+
+  // Helper to resolve actual rendering src from path or URL
+  const resolveImageSrc = (src: string): string => {
+    if (!src) return "";
+    if (sessionPreviews[src]) {
+      return sessionPreviews[src];
+    }
+    return src;
+  };
+
   // System notification
   const [notification, setNotification] = useState<string | null>(null);
 
@@ -254,31 +305,107 @@ export default function App() {
   };
 
   const handleCategoryIconUpload = (catId: string, e: React.ChangeEvent<HTMLInputElement>) => {
+    setUploadError(null);
     const file = e.target.files?.[0];
     if (!file) return;
 
     const validTypes = ["image/jpeg", "image/png", "image/webp", "image/jpg"];
     if (!validTypes.includes(file.type)) {
+      setUploadError("이미지 경로 또는 파일 용량을 확인해주세요");
       alert("JPG, PNG, WEBP 형식의 이미지 파일만 업로드할 수 있습니다.");
       return;
     }
 
-    const reader = new FileReader();
-    reader.onload = (event) => {
-      const base64Data = event.target?.result as string;
-      if (base64Data) {
+    const isLarge = file.size > 1.5 * 1024 * 1024;
+    if (isLarge) {
+      const wantCompress = window.confirm(
+        `업로드하려는 파일("${file.name}")의 크기가 큽니다 (${(file.size / 1024 / 1024).toFixed(1)}MB).\n성능 최적화 및 브라우저 저장을 위해 자동으로 압축하여 등록할까요?`
+      );
+      if (!wantCompress) {
+        const sanitized = sanitizeFilename(file.name);
+        const imagePath = `/images/category_${catId}_${sanitized}`;
+        
+        const previewUrl = URL.createObjectURL(file);
+        saveSessionPreviews({
+          ...sessionPreviews,
+          [imagePath]: previewUrl
+        });
+
         setCategories(prevCategories => {
           const updated = prevCategories.map(c => {
             if (c.id === catId) {
-              return { ...c, image: base64Data };
+              return { ...c, image: imagePath };
             }
             return c;
           });
           saveAllData(updated, projects);
           return updated;
         });
-        triggerNotification(`CATEGORY "${catId}" THUMBNAIL UPDATED.`);
+        triggerNotification(`CATEGORY "${catId}" THUMBNAIL REGISTERED.`);
+        return;
       }
+    }
+
+    const reader = new FileReader();
+    reader.onload = (event) => {
+      const img = new Image();
+      img.onload = () => {
+        const MAX_WIDTH = 400;
+        const MAX_HEIGHT = 400;
+        let width = img.width;
+        let height = img.height;
+
+        if (width > height) {
+          if (width > MAX_WIDTH) {
+            height *= MAX_WIDTH / width;
+            width = MAX_WIDTH;
+          }
+        } else {
+          if (height > MAX_HEIGHT) {
+            width *= MAX_HEIGHT / height;
+            height = MAX_HEIGHT;
+          }
+        }
+
+        const canvas = document.createElement("canvas");
+        canvas.width = width;
+        canvas.height = height;
+
+        const ctx = canvas.getContext("2d");
+        if (ctx) {
+          ctx.drawImage(img, 0, 0, width, height);
+          const compressedBase64 = canvas.toDataURL("image/jpeg", 0.7);
+          
+          const sanitized = sanitizeFilename(file.name);
+          const imagePath = `/images/category_${catId}_${sanitized}`;
+
+          saveSessionPreviews({
+            ...sessionPreviews,
+            [imagePath]: compressedBase64
+          });
+
+          setCategories(prevCategories => {
+            const updated = prevCategories.map(c => {
+              if (c.id === catId) {
+                return { ...c, image: imagePath };
+              }
+              return c;
+            });
+            saveAllData(updated, projects);
+            return updated;
+          });
+          triggerNotification(`CATEGORY "${catId}" THUMBNAIL UPDATED.`);
+        }
+      };
+      img.onerror = () => {
+        setUploadError("이미지 경로 또는 파일 용량을 확인해주세요");
+        triggerNotification("ERROR: FAILED TO PROCESS CATEGORY IMAGE.");
+      };
+      img.src = event.target?.result as string;
+    };
+    reader.onerror = () => {
+      setUploadError("이미지 경로 또는 파일 용량을 확인해주세요");
+      triggerNotification("ERROR: CATEGORY IMAGE FILE READER ERROR.");
     };
     reader.readAsDataURL(file);
   };
@@ -414,7 +541,7 @@ export default function App() {
     setFormLighting(project.materialLighting.lighting.join(", "));
     setFormMatDesc(project.materialLighting.description);
     setFormDrawingType(project.drawings[0]?.svgType || "exhibition-floor");
-    setFormImages((project.images || []).filter(img => img.startsWith("data:") || img.startsWith("blob:")));
+    setFormImages((project.images || []).filter(img => img.startsWith("data:") || img.startsWith("blob:") || img.startsWith("http") || img.startsWith("/")));
     
     const flowText = project.userFlow.map(f => `${f.step}:${f.title}:${f.description}`).join("\n");
     setFormUserFlow(flowText);
@@ -444,9 +571,32 @@ export default function App() {
 
   // Image upload compression & base64 conversion helper
   const processAndAddImage = (file: File) => {
+    setUploadError(null);
     if (!file.type.startsWith("image/")) {
+      setUploadError("이미지 경로 또는 파일 용량을 확인해주세요");
       triggerNotification("ERROR: SELECTED FILE IS NOT AN IMAGE.");
       return;
+    }
+
+    const isLarge = file.size > 1.5 * 1024 * 1024;
+    if (isLarge) {
+      const wantCompress = window.confirm(
+        `업로드하려는 파일("${file.name}")의 크기가 큽니다 (${(file.size / 1024 / 1024).toFixed(1)}MB).\n성능 최적화 및 브라우저 저장을 위해 자동으로 압축하여 등록할까요?\n\n* "취소"를 누르시면 원본 경로만 등록됩니다.`
+      );
+      if (!wantCompress) {
+        const sanitized = sanitizeFilename(file.name);
+        const imagePath = `/images/${sanitized}`;
+        
+        const previewUrl = URL.createObjectURL(file);
+        saveSessionPreviews({
+          ...sessionPreviews,
+          [imagePath]: previewUrl
+        });
+
+        setFormImages(prev => [...prev, imagePath]);
+        triggerNotification(`IMAGE REFERENCE "${sanitized}" REGISTERED.`);
+        return;
+      }
     }
 
     const reader = new FileReader();
@@ -479,14 +629,28 @@ export default function App() {
         if (ctx) {
           ctx.drawImage(img, 0, 0, width, height);
           const compressedBase64 = canvas.toDataURL("image/jpeg", 0.75);
-          setFormImages(prev => [...prev, compressedBase64]);
+          
+          const sanitized = sanitizeFilename(file.name);
+          const imagePath = `/images/${sanitized}`;
+
+          saveSessionPreviews({
+            ...sessionPreviews,
+            [imagePath]: compressedBase64
+          });
+
+          setFormImages(prev => [...prev, imagePath]);
           triggerNotification("IMAGE LOADED AND COMPRESSED SUCCESSFULLY.");
         }
       };
       img.onerror = () => {
+        setUploadError("이미지 경로 또는 파일 용량을 확인해주세요");
         triggerNotification("ERROR: FAILED TO PROCESS IMAGE.");
       };
       img.src = e.target?.result as string;
+    };
+    reader.onerror = () => {
+      setUploadError("이미지 경로 또는 파일 용량을 확인해주세요");
+      triggerNotification("ERROR: FILE READER ERROR.");
     };
     reader.readAsDataURL(file);
   };
@@ -525,15 +689,48 @@ export default function App() {
 
   const handleDirectImageUpload = (files: FileList) => {
     if (!selectedProject) return;
+    setUploadError(null);
 
-    let processedCount = 0;
     const targetProject = selectedProject;
     const filesArray = Array.from(files);
 
     filesArray.forEach((file) => {
       if (!file.type.startsWith("image/")) {
+        setUploadError("이미지 경로 또는 파일 용량을 확인해주세요");
         triggerNotification("ERROR: SELECTED FILE IS NOT AN IMAGE.");
         return;
+      }
+
+      const isLarge = file.size > 1.5 * 1024 * 1024;
+      if (isLarge) {
+        const wantCompress = window.confirm(
+          `업로드하려는 파일("${file.name}")의 크기가 큽니다 (${(file.size / 1024 / 1024).toFixed(1)}MB).\n성능 최적화 및 브라우저 저장을 위해 자동으로 압축하여 업로드하시겠습니까?\n\n* "취소"를 누르시면 원본 경로만 등록됩니다.`
+        );
+        if (!wantCompress) {
+          const sanitized = sanitizeFilename(file.name);
+          const imagePath = `/images/${sanitized}`;
+          
+          const previewUrl = URL.createObjectURL(file);
+          const updatedPreviews = { ...sessionPreviews, [imagePath]: previewUrl };
+          saveSessionPreviews(updatedPreviews);
+
+          setProjects(prevProjects => {
+            const updated = prevProjects.map(p => {
+              if (p.id === targetProject.id) {
+                const existingImages = p.images || [];
+                const newImages = [...existingImages, imagePath];
+                
+                setSelectedProject(prev => prev && prev.id === targetProject.id ? { ...prev, images: newImages } : prev);
+                return { ...p, images: newImages };
+              }
+              return p;
+            });
+            saveAllData(categories, updated);
+            return updated;
+          });
+          triggerNotification(`IMAGE REFERENCE "${sanitized}" REGISTERED.`);
+          return;
+        }
       }
 
       const reader = new FileReader();
@@ -566,13 +763,18 @@ export default function App() {
             ctx.drawImage(img, 0, 0, width, height);
             const compressedBase64 = canvas.toDataURL("image/jpeg", 0.75);
             
+            const sanitized = sanitizeFilename(file.name);
+            const imagePath = `/images/${sanitized}`;
+
+            const updatedPreviews = { ...sessionPreviews, [imagePath]: compressedBase64 };
+            saveSessionPreviews(updatedPreviews);
+
             setProjects(prevProjects => {
               const updated = prevProjects.map(p => {
                 if (p.id === targetProject.id) {
                   const existingImages = p.images || [];
-                  const newImages = [...existingImages, compressedBase64];
+                  const newImages = [...existingImages, imagePath];
                   
-                  // Update selectedProject in real-time as well
                   setSelectedProject(prev => prev && prev.id === targetProject.id ? { ...prev, images: newImages } : prev);
                   return { ...p, images: newImages };
                 }
@@ -582,11 +784,18 @@ export default function App() {
               return updated;
             });
             
-            processedCount++;
-            triggerNotification(`IMAGE "${file.name}" UPLOADED SUCCESSFULLY.`);
+            triggerNotification(`IMAGE "${file.name}" UPLOADED AND COMPRESSED SUCCESSFULLY.`);
           }
         };
+        img.onerror = () => {
+          setUploadError("이미지 경로 또는 파일 용량을 확인해주세요");
+          triggerNotification("ERROR: FAILED TO PROCESS IMAGE.");
+        };
         img.src = e.target?.result as string;
+      };
+      reader.onerror = () => {
+        setUploadError("이미지 경로 또는 파일 용량을 확인해주세요");
+        triggerNotification("ERROR: FILE READER ERROR.");
       };
       reader.readAsDataURL(file);
     });
@@ -607,7 +816,7 @@ export default function App() {
           
           setSelectedProject(prev => prev ? { ...prev, images: newImages } : null);
           setActiveImageIndex(prev => {
-            const nextUploadedCount = newImages.filter(img => img.startsWith("data:") || img.startsWith("blob:")).length;
+            const nextUploadedCount = newImages.filter(img => img.startsWith("data:") || img.startsWith("blob:") || img.startsWith("/") || img.startsWith("http")).length;
             if (nextUploadedCount === 0) return 0;
             if (prev >= nextUploadedCount) return nextUploadedCount - 1;
             return prev;
@@ -723,9 +932,9 @@ export default function App() {
     }
   };
 
-  // Filter selected project images to only show user-uploaded base64 images
+  // Filter selected project images to show both user-uploaded and default portfolio images
   const uploadedImages = selectedProject
-    ? (selectedProject.images || []).filter(img => img.startsWith("data:") || img.startsWith("blob:"))
+    ? (selectedProject.images || []).filter(img => img.startsWith("data:") || img.startsWith("blob:") || img.startsWith("http") || img.startsWith("/"))
     : [];
 
   return (
@@ -959,7 +1168,7 @@ export default function App() {
                       {cat.image ? (
                         <div className="relative w-full h-full flex items-center justify-center">
                           <img 
-                            src={cat.image} 
+                            src={resolveImageSrc(cat.image)} 
                             alt={cat.title} 
                             className="w-full h-full object-contain select-none"
                             referrerPolicy="no-referrer"
@@ -1361,7 +1570,7 @@ export default function App() {
                           {/* Technical attributes tags */}
                           <div className="mt-4 flex flex-wrap gap-2 text-[10px] font-mono">
                             <span className="text-zinc-500 mr-1 self-center">SOFTWARE USED:</span>
-                            {selectedProject.tools.map((t, idx) => (
+                            {(selectedProject?.tools || []).map((t, idx) => (
                               <span key={idx} className="bg-zinc-900 border border-zinc-800 text-sky-400 px-2 py-0.5 rounded">
                                 {t}
                               </span>
@@ -1407,8 +1616,8 @@ export default function App() {
                                 </div>
 
                                 <img 
-                                  src={uploadedImages[activeImageIndex]} 
-                                  alt={`${selectedProject.title} rendering`}
+                                  src={resolveImageSrc(uploadedImages[activeImageIndex]) || ""} 
+                                  alt={`${selectedProject?.title || ""} rendering`}
                                   referrerPolicy="no-referrer"
                                   className="w-full h-full object-cover select-none"
                                 />
@@ -1448,7 +1657,7 @@ export default function App() {
                                       }`}
                                     >
                                       <img 
-                                        src={img} 
+                                        src={resolveImageSrc(img)} 
                                         alt="thumbnail" 
                                         referrerPolicy="no-referrer"
                                         className="w-full h-full object-cover" 
@@ -1486,36 +1695,57 @@ export default function App() {
                                 : "border-sky-950/40 bg-[#090c10]/40 hover:bg-[#0c1015]/40"
                             }`}
                           >
-                            <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
-                              <div className="space-y-1 text-center sm:text-left">
-                                <div className="flex items-center justify-center sm:justify-start gap-1.5 text-[11px] text-zinc-300 font-bold">
-                                  <Upload className="w-4 h-4 text-sky-400" />
-                                  <span>내 컴퓨터 이미지 다중 첨부 (Drag & Drop)</span>
+                            <div className="space-y-3">
+                              {/* Filename guide / manual warning */}
+                              <p className="text-[10px] text-zinc-400 leading-relaxed text-center sm:text-left font-sans">
+                                * <span className="text-sky-400 font-bold">안내:</span> 이미지 파일명에 한글, 공백, 특수문자, 괄호가 포함된 경우 자동으로 안전하게 변환됩니다. 가능하면 <span className="text-sky-400 font-bold underline">영문 소문자, 숫자, 언더바(_)</span>만 사용해주세요.
+                              </p>
+
+                              {uploadError && (
+                                <div className="p-2.5 bg-rose-950/20 border border-rose-500/30 rounded text-rose-300 text-xs font-mono flex items-center gap-2">
+                                  <AlertCircle className="w-4 h-4 text-rose-400 shrink-0" />
+                                  <span>{uploadError}</span>
+                                  <button 
+                                    type="button" 
+                                    onClick={() => setUploadError(null)} 
+                                    className="ml-auto text-zinc-500 hover:text-zinc-300 font-sans"
+                                  >
+                                    ✕
+                                  </button>
                                 </div>
-                                <p className="text-[10px] text-zinc-500 font-sans">
-                                  이미지 파일들을 여기로 드래그하거나 컴퓨터에서 선택하세요. (JPEG, PNG 등 다중 선택 가능)
-                                </p>
+                              )}
+
+                              <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
+                                <div className="space-y-1 text-center sm:text-left">
+                                  <div className="flex items-center justify-center sm:justify-start gap-1.5 text-[11px] text-zinc-300 font-bold">
+                                    <Upload className="w-4 h-4 text-sky-400" />
+                                    <span>내 컴퓨터 이미지 다중 첨부 (Drag & Drop)</span>
+                                  </div>
+                                  <p className="text-[10px] text-zinc-500 font-sans">
+                                    이미지 파일들을 여기로 드래그하거나 컴퓨터에서 선택하세요. (JPEG, PNG 등 다중 선택 가능)
+                                  </p>
+                                </div>
+                                <button
+                                  type="button"
+                                  onClick={() => document.getElementById("direct-detail-upload")?.click()}
+                                  className="w-full sm:w-auto px-4 py-1.5 rounded bg-[#0e1724] hover:bg-[#132236] border border-sky-500/30 text-sky-300 text-xs font-bold transition-all whitespace-nowrap shrink-0 flex items-center justify-center gap-1.5 shadow-[0_0_12px_rgba(56,189,248,0.1)] hover:shadow-[0_0_15px_rgba(56,189,248,0.2)]"
+                                >
+                                  <Plus className="w-3.5 h-3.5" />
+                                  <span>컴퓨터 파일 선택</span>
+                                </button>
+                                <input
+                                  type="file"
+                                  id="direct-detail-upload"
+                                  multiple
+                                  accept="image/*"
+                                  onChange={(e) => {
+                                    if (e.target.files) {
+                                      handleDirectImageUpload(e.target.files);
+                                    }
+                                  }}
+                                  className="hidden"
+                                />
                               </div>
-                              <button
-                                type="button"
-                                onClick={() => document.getElementById("direct-detail-upload")?.click()}
-                                className="w-full sm:w-auto px-4 py-1.5 rounded bg-[#0e1724] hover:bg-[#132236] border border-sky-500/30 text-sky-300 text-xs font-bold transition-all whitespace-nowrap shrink-0 flex items-center justify-center gap-1.5 shadow-[0_0_12px_rgba(56,189,248,0.1)] hover:shadow-[0_0_15px_rgba(56,189,248,0.2)]"
-                              >
-                                <Plus className="w-3.5 h-3.5" />
-                                <span>컴퓨터 파일 선택</span>
-                              </button>
-                              <input
-                                type="file"
-                                id="direct-detail-upload"
-                                multiple
-                                accept="image/*"
-                                onChange={(e) => {
-                                  if (e.target.files) {
-                                    handleDirectImageUpload(e.target.files);
-                                  }
-                                }}
-                                className="hidden"
-                              />
                             </div>
                           </div>
                         </div>
@@ -1567,7 +1797,7 @@ export default function App() {
                               MATERIAL SCHEDULE (마감재 세부 계획)
                             </h5>
                             <ul className="space-y-1.5 text-xs text-zinc-400 font-mono">
-                              {selectedProject.materialLighting.materials.map((mat, idx) => (
+                              {(selectedProject?.materialLighting?.materials || []).map((mat, idx) => (
                                 <li key={idx} className="flex items-center gap-2">
                                   <span className="w-1.5 h-1.5 bg-sky-400 rounded-full"></span>
                                   <span>{mat}</span>
@@ -1582,7 +1812,7 @@ export default function App() {
                               LIGHTING SPECIFICATION (조명 설계안)
                             </h5>
                             <ul className="space-y-1.5 text-xs text-zinc-400 font-mono">
-                              {selectedProject.materialLighting.lighting.map((light, idx) => (
+                              {(selectedProject?.materialLighting?.lighting || []).map((light, idx) => (
                                 <li key={idx} className="flex items-center gap-2">
                                   <span className="w-1.5 h-1.5 bg-rose-400 rounded-full"></span>
                                   <span>{light}</span>
@@ -1598,7 +1828,7 @@ export default function App() {
                             PROJECT IMPLEMENTATION PROCESS (설계 프로세스 타임라인)
                           </h4>
                           <div className="space-y-2 text-xs">
-                            {selectedProject.process.map((step, idx) => (
+                            {(selectedProject?.process || []).map((step, idx) => (
                               <div key={idx} className="flex items-start gap-3">
                                 <span className="bg-sky-950 border border-sky-400/30 text-sky-300 w-5 h-5 rounded-full flex items-center justify-center font-bold text-[9px] shrink-0">
                                   {idx + 1}
@@ -1896,6 +2126,11 @@ export default function App() {
                   PORTFOLIO IMAGES (내컴퓨터 이미지 다중 첨부)
                 </label>
                 
+                {/* Filename guide / manual warning */}
+                <p className="text-[10px] text-zinc-400 mb-2 leading-relaxed">
+                  * <span className="text-sky-400 font-bold">안내:</span> 이미지 파일명에 한글, 공백, 특수문자, 괄호가 포함된 경우 오류 방지를 위해 자동으로 안전한 파일명으로 변환되어 저장됩니다. 가능하면 파일명은 <span className="text-sky-400 font-bold underline">영문 소문자, 숫자, 언더바(_)</span>만 사용해주세요.
+                </p>
+
                 {/* Drag and drop target wrapper */}
                 <div
                   onDragOver={handleDragOver}
@@ -1922,20 +2157,81 @@ export default function App() {
                       이미지 파일을 여기로 드래그앤드롭 하거나 <span className="text-sky-400 underline">클릭해서 선택</span>하세요.
                     </p>
                     <p className="text-[9px] text-zinc-500 font-mono">
-                      * 다중 첨부 가능 (CAD-OS 고효율 압축 엔진 탑재)
+                      * 다중 첨부 가능 (자동 최적화 압축 지원)
                     </p>
                   </div>
                 </div>
 
+                {/* Manual Path Input Area */}
+                <div className="mt-3 space-y-1">
+                  <label className="block text-zinc-500 text-[9px] uppercase tracking-wider">또는 이미지 URL/경로 직접 입력</label>
+                  <div className="flex gap-2">
+                    <input
+                      type="text"
+                      id="manual-image-url-input"
+                      placeholder="예: /images/파일명.png 또는 https://images.unsplash.com/..."
+                      className="flex-1 bg-zinc-950 border border-zinc-800 focus:border-sky-400 p-2 rounded text-zinc-200 focus:outline-none text-[11px]"
+                      onKeyDown={(e) => {
+                        if (e.key === 'Enter') {
+                          e.preventDefault();
+                          const inputEl = document.getElementById("manual-image-url-input") as HTMLInputElement;
+                          if (inputEl && inputEl.value.trim()) {
+                            let val = inputEl.value.trim();
+                            if (!val.startsWith("http") && !val.startsWith("data:") && !val.startsWith("/")) {
+                              val = "/" + val;
+                            }
+                            setFormImages(prev => [...prev, val]);
+                            inputEl.value = "";
+                            triggerNotification("CUSTOM IMAGE PATH ADDED.");
+                          }
+                        }
+                      }}
+                    />
+                    <button
+                      type="button"
+                      onClick={() => {
+                        const inputEl = document.getElementById("manual-image-url-input") as HTMLInputElement;
+                        if (inputEl && inputEl.value.trim()) {
+                          let val = inputEl.value.trim();
+                          if (!val.startsWith("http") && !val.startsWith("data:") && !val.startsWith("/")) {
+                            val = "/" + val;
+                          }
+                          setFormImages(prev => [...prev, val]);
+                          inputEl.value = "";
+                          triggerNotification("CUSTOM IMAGE PATH ADDED.");
+                        }
+                      }}
+                      className="px-3 bg-sky-950 hover:bg-sky-900 border border-sky-500/30 text-sky-300 rounded font-bold text-[11px] whitespace-nowrap"
+                    >
+                      경로 추가
+                    </button>
+                  </div>
+                </div>
+
+                {/* On-screen error message display */}
+                {uploadError && (
+                  <div className="mt-3 p-3 bg-rose-950/20 border border-rose-500/30 rounded text-rose-300 text-xs font-mono flex items-center gap-2">
+                    <AlertCircle className="w-4 h-4 text-rose-400 shrink-0" />
+                    <span>{uploadError}</span>
+                    <button 
+                      type="button" 
+                      onClick={() => setUploadError(null)} 
+                      className="ml-auto text-zinc-500 hover:text-zinc-300 font-sans"
+                    >
+                      ✕
+                    </button>
+                  </div>
+                )}
+
                 {/* Previews wrapper if files exist */}
                 {formImages.length > 0 && (
-                  <div className="mt-3 space-y-1.5">
+                  <div className="mt-4 space-y-1.5">
                     <p className="text-[9px] text-zinc-500 font-mono">ATTACHED RENDERS ({formImages.length} IMAGES):</p>
                     <div className="flex flex-wrap gap-2">
                       {formImages.map((img, idx) => (
                         <div key={idx} className="relative w-16 aspect-[16/9] rounded border border-zinc-800 overflow-hidden group">
                           <img
-                            src={img}
+                            src={resolveImageSrc(img)}
                             alt="preview"
                             className="w-full h-full object-cover"
                             referrerPolicy="no-referrer"
