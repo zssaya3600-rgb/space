@@ -25,6 +25,10 @@ export interface Project {
   renderingUrl: string; // Used for generated mockups or custom UI
   finalImageUrl: string;
   images?: string[]; // Multiple uploaded image data URLs or default mockups
+  panoramaUrl?: string;
+  videoUrl?: string;
+  archiveUrl?: string;
+  archiveLabel?: string;
 }
 
 export interface Category {

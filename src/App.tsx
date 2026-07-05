@@ -32,7 +32,10 @@ import {
   ChevronLeft,
   Eye,
   GraduationCap,
-  AlertCircle
+  AlertCircle,
+  Globe,
+  Video,
+  Link
 } from "lucide-react";
 import { defaultCategories, defaultProjects } from "./data";
 import { Category, Project } from "./types";
@@ -225,6 +228,10 @@ export default function App() {
   const [formDrawingType, setFormDrawingType] = useState<"exhibition-floor" | "retail-layout" | "minimal-lounge" | "detail-section" | "vr-gallery">("exhibition-floor");
   const [formUserFlow, setFormUserFlow] = useState(""); // JSON format or semi-colon separated
   const [formImages, setFormImages] = useState<string[]>([]);
+  const [formPanoramaUrl, setFormPanoramaUrl] = useState("");
+  const [formVideoUrl, setFormVideoUrl] = useState("");
+  const [formArchiveUrl, setFormArchiveUrl] = useState("");
+  const [formArchiveLabel, setFormArchiveLabel] = useState("");
   const [isDragging, setIsDragging] = useState(false);
   const [activeImageIndex, setActiveImageIndex] = useState(0);
   const [isDetailDragging, setIsDetailDragging] = useState(false);
@@ -249,6 +256,30 @@ export default function App() {
   };
 
   const [uploadError, setUploadError] = useState<string | null>(null);
+  const [linkError, setLinkError] = useState<string | null>(null);
+
+  // Helper to ensure URL starts with http:// or https://
+  const ensureAbsoluteUrl = (url: string | undefined): string => {
+    if (!url) return "";
+    const trimmed = url.trim();
+    if (!trimmed) return "";
+    if (/^https?:\/\//i.test(trimmed)) {
+      return trimmed;
+    }
+    return `https://${trimmed}`;
+  };
+
+  // Helper to validate URL structure
+  const isValidUrl = (url: string | undefined): boolean => {
+    if (!url) return false;
+    const target = ensureAbsoluteUrl(url);
+    try {
+      new URL(target);
+      return true;
+    } catch {
+      return false;
+    }
+  };
 
   // Helper to sanitize filenames to prevent encoding or space issues
   const sanitizeFilename = (filename: string): string => {
@@ -504,7 +535,11 @@ export default function App() {
       },
       renderingUrl: editingProject?.renderingUrl || "custom_render",
       finalImageUrl: editingProject?.finalImageUrl || "custom_final",
-      images: formImages
+      images: formImages,
+      panoramaUrl: formPanoramaUrl,
+      videoUrl: formVideoUrl,
+      archiveUrl: formArchiveUrl,
+      archiveLabel: formArchiveLabel
     };
 
     let newProjects = [...projects];
@@ -546,6 +581,11 @@ export default function App() {
     const flowText = project.userFlow.map(f => `${f.step}:${f.title}:${f.description}`).join("\n");
     setFormUserFlow(flowText);
     
+    setFormPanoramaUrl(project.panoramaUrl || "");
+    setFormVideoUrl(project.videoUrl || "");
+    setFormArchiveUrl(project.archiveUrl || "");
+    setFormArchiveLabel(project.archiveLabel || "");
+    
     setShowAddProjectModal(true);
   };
 
@@ -565,6 +605,11 @@ export default function App() {
     setFormDrawingType("exhibition-floor");
     setFormUserFlow("Zone 1:Welcome Area:관람객의 호기심을 유도하는 낮은 조도의 저밀도 진입동선\nZone 2:Core Experience:브랜드 핵심 콘텐츠가 입체감 있게 전달되는 인터랙티브 존");
     setFormImages([]);
+    
+    setFormPanoramaUrl("");
+    setFormVideoUrl("");
+    setFormArchiveUrl("");
+    setFormArchiveLabel("");
     
     setShowAddProjectModal(true);
   };
@@ -1512,6 +1557,29 @@ export default function App() {
                             <h4 className="text-xs font-semibold leading-snug line-clamp-2">
                               {proj.title}
                             </h4>
+                            {/* External Link Badges */}
+                            {(proj.panoramaUrl || proj.videoUrl || proj.archiveUrl) && (
+                              <div className="mt-1.5 flex flex-wrap gap-1">
+                                {proj.panoramaUrl && (
+                                  <span className="inline-flex items-center gap-0.5 px-1 py-0.2 rounded bg-sky-950/40 text-[8px] font-mono text-sky-400 border border-sky-800/30">
+                                    <Globe className="w-2 h-2 text-sky-400" />
+                                    <span>360°</span>
+                                  </span>
+                                )}
+                                {proj.videoUrl && (
+                                  <span className="inline-flex items-center gap-0.5 px-1 py-0.2 rounded bg-sky-950/40 text-[8px] font-mono text-sky-400 border border-sky-800/30">
+                                    <Video className="w-2 h-2 text-sky-400" />
+                                    <span>VIDEO</span>
+                                  </span>
+                                )}
+                                {proj.archiveUrl && (
+                                  <span className="inline-flex items-center gap-0.5 px-1 py-0.2 rounded bg-sky-950/40 text-[8px] font-mono text-sky-400 border border-sky-800/30">
+                                    <Link className="w-2 h-2 text-sky-400" />
+                                    <span>LINK</span>
+                                  </span>
+                                )}
+                              </div>
+                            )}
                             <div className="mt-2 flex items-center justify-between text-[9px] font-mono text-zinc-500">
                               <span>{proj.tools[0]}</span>
                               <span className="flex items-center gap-1">
@@ -1757,6 +1825,119 @@ export default function App() {
                           </div>
                           <div className="md:col-span-9 text-xs leading-relaxed text-zinc-300 font-sans">
                             {selectedProject.concept}
+                          </div>
+                        </div>
+
+                        {/* External Experience Links Section */}
+                        <div className="p-5 rounded-lg border border-sky-950/30 bg-[#0a0d14] space-y-4 shadow-[0_0_20px_rgba(56,189,248,0.02)]">
+                          <div className="border-b border-zinc-900 pb-3 flex flex-col md:flex-row md:items-center justify-between gap-3">
+                            <div>
+                              <h4 className="font-mono text-[11px] text-sky-400 font-bold uppercase tracking-widest flex items-center gap-2">
+                                <Globe className="w-4 h-4 text-sky-400 animate-pulse" />
+                                <span>EXTERNAL EXPERIENCE LINKS</span>
+                              </h4>
+                              <p className="text-[10px] text-zinc-400 mt-1 font-sans">
+                                Explore the project through 360° panorama, video walkthrough, and external archive links.
+                              </p>
+                              <p className="text-[9px] text-zinc-500 font-sans">
+                                360도 파노라마, 영상, 외부 아카이브 링크를 통해 프로젝트를 입체적으로 확인할 수 있습니다.
+                              </p>
+                            </div>
+                            
+                            <span className="font-mono text-[9px] text-zinc-400 shrink-0 bg-sky-950/20 px-2 py-0.5 rounded border border-sky-900/30 self-start md:self-auto">
+                              STATUS: {[selectedProject.panoramaUrl, selectedProject.videoUrl, selectedProject.archiveUrl].filter(Boolean).length}/3 ACTIVE
+                            </span>
+                          </div>
+
+                          {linkError && (
+                            <div className="p-3 bg-rose-950/20 border border-rose-500/30 rounded text-rose-300 text-xs font-mono flex items-center gap-2">
+                              <AlertCircle className="w-4 h-4 text-rose-400 shrink-0" />
+                              <span>{linkError}</span>
+                              <button 
+                                type="button" 
+                                onClick={() => setLinkError(null)} 
+                                className="ml-auto text-zinc-500 hover:text-zinc-300"
+                              >
+                                ✕
+                              </button>
+                            </div>
+                          )}
+
+                          <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                            {/* VIEW 360° PANORAMA */}
+                            {selectedProject.panoramaUrl ? (
+                              <button
+                                onClick={() => {
+                                  const url = selectedProject.panoramaUrl;
+                                  if (!url || !isValidUrl(url)) {
+                                    setLinkError("링크 주소를 확인해주세요");
+                                    return;
+                                  }
+                                  setLinkError(null);
+                                  window.open(ensureAbsoluteUrl(url), "_blank", "noopener,noreferrer");
+                                }}
+                                className="flex items-center justify-center gap-2 px-4 py-2.5 rounded bg-sky-950/40 hover:bg-sky-900/60 border border-sky-500/30 hover:border-sky-400/60 text-sky-300 hover:text-sky-200 text-xs font-bold font-mono tracking-wider transition-all shadow-[0_0_10px_rgba(56,189,248,0.05)] hover:shadow-[0_0_15px_rgba(56,189,248,0.2)] hover:-translate-y-0.5"
+                              >
+                                <Globe className="w-4 h-4 shrink-0" />
+                                <span>VIEW 360° PANORAMA</span>
+                                <ExternalLink className="w-3.5 h-3.5 opacity-60" />
+                              </button>
+                            ) : (
+                              <div className="flex items-center justify-center gap-2 px-4 py-2.5 rounded bg-zinc-950/40 border border-zinc-900 text-zinc-600 text-xs font-mono select-none cursor-not-allowed">
+                                <Globe className="w-4 h-4 shrink-0 opacity-40" />
+                                <span>PANORAMA: LINK NOT SET</span>
+                              </div>
+                            )}
+
+                            {/* WATCH VIDEO */}
+                            {selectedProject.videoUrl ? (
+                              <button
+                                onClick={() => {
+                                  const url = selectedProject.videoUrl;
+                                  if (!url || !isValidUrl(url)) {
+                                    setLinkError("링크 주소를 확인해주세요");
+                                    return;
+                                  }
+                                  setLinkError(null);
+                                  window.open(ensureAbsoluteUrl(url), "_blank", "noopener,noreferrer");
+                                }}
+                                className="flex items-center justify-center gap-2 px-4 py-2.5 rounded bg-sky-950/40 hover:bg-sky-900/60 border border-sky-500/30 hover:border-sky-400/60 text-sky-300 hover:text-sky-200 text-xs font-bold font-mono tracking-wider transition-all shadow-[0_0_10px_rgba(56,189,248,0.05)] hover:shadow-[0_0_15px_rgba(56,189,248,0.2)] hover:-translate-y-0.5"
+                              >
+                                <Video className="w-4 h-4 shrink-0" />
+                                <span>WATCH VIDEO</span>
+                                <ExternalLink className="w-3.5 h-3.5 opacity-60" />
+                              </button>
+                            ) : (
+                              <div className="flex items-center justify-center gap-2 px-4 py-2.5 rounded bg-zinc-950/40 border border-zinc-900 text-zinc-600 text-xs font-mono select-none cursor-not-allowed">
+                                <Video className="w-4 h-4 shrink-0 opacity-40" />
+                                <span>VIDEO: LINK NOT SET</span>
+                              </div>
+                            )}
+
+                            {/* OPEN PROJECT LINK */}
+                            {selectedProject.archiveUrl ? (
+                              <button
+                                onClick={() => {
+                                  const url = selectedProject.archiveUrl;
+                                  if (!url || !isValidUrl(url)) {
+                                    setLinkError("링크 주소를 확인해주세요");
+                                    return;
+                                  }
+                                  setLinkError(null);
+                                  window.open(ensureAbsoluteUrl(url), "_blank", "noopener,noreferrer");
+                                }}
+                                className="flex items-center justify-center gap-2 px-4 py-2.5 rounded bg-sky-950/40 hover:bg-sky-900/60 border border-sky-500/30 hover:border-sky-400/60 text-sky-300 hover:text-sky-200 text-xs font-bold font-mono tracking-wider transition-all shadow-[0_0_10px_rgba(56,189,248,0.05)] hover:shadow-[0_0_15px_rgba(56,189,248,0.2)] hover:-translate-y-0.5"
+                              >
+                                <Link className="w-4 h-4 shrink-0" />
+                                <span>{selectedProject.archiveLabel || "OPEN PROJECT LINK"}</span>
+                                <ExternalLink className="w-3.5 h-3.5 opacity-60" />
+                              </button>
+                            ) : (
+                              <div className="flex items-center justify-center gap-2 px-4 py-2.5 rounded bg-zinc-950/40 border border-zinc-900 text-zinc-600 text-xs font-mono select-none cursor-not-allowed">
+                                <Link className="w-4 h-4 shrink-0 opacity-40" />
+                                <span>LINK: LINK NOT SET</span>
+                              </div>
+                            )}
                           </div>
                         </div>
 
@@ -2118,6 +2299,66 @@ export default function App() {
                   rows={3}
                   className="w-full bg-zinc-950 border border-zinc-800 focus:border-sky-400 p-2 rounded text-zinc-200 focus:outline-none"
                 />
+              </div>
+
+              {/* External Experience Links Section */}
+              <div className="p-4 rounded-lg bg-[#08090d] border border-sky-950/40 space-y-3.5">
+                <span className="block text-[10px] text-sky-400 font-bold uppercase tracking-wider">
+                  EXTERNAL EXPERIENCE LINKS (외부 아카이브 및 실감 콘텐츠 연결)
+                </span>
+                
+                <p className="text-[9px] text-zinc-500 leading-relaxed font-sans">
+                  * 360도 파노라마 VR(키파노 등), 워크스루 비디오, 기타 포트폴리오 아카이브용 외부 주소를 연결할 수 있습니다. <br />
+                  * 입력된 링크는 상세 화면에서 각각 전용 버튼으로 표출되며, 비어 있는 경우 비활성화 또는 표시되지 않습니다.
+                </p>
+
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
+                  <div>
+                    <label className="block text-zinc-500 mb-1 text-[10px]">360° PANORAMA URL (키파노 / VR 파노라마 주소)</label>
+                    <input 
+                      type="text" 
+                      value={formPanoramaUrl}
+                      onChange={(e) => setFormPanoramaUrl(e.target.value)}
+                      placeholder="예: kuula.co/share/collection/7K7Pz"
+                      className="w-full bg-zinc-950 border border-zinc-850 focus:border-sky-400 p-2 rounded text-zinc-200 focus:outline-none text-[11px]"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-zinc-500 mb-1 text-[10px]">VIDEO URL (유튜브 / 비메오 / 구글드라이브 영상 주소)</label>
+                    <input 
+                      type="text" 
+                      value={formVideoUrl}
+                      onChange={(e) => setFormVideoUrl(e.target.value)}
+                      placeholder="예: youtube.com/watch?v=..."
+                      className="w-full bg-zinc-950 border border-zinc-850 focus:border-sky-400 p-2 rounded text-zinc-200 focus:outline-none text-[11px]"
+                    />
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
+                  <div>
+                    <label className="block text-zinc-500 mb-1 text-[10px]">PROJECT ARCHIVE URL (기타 외부 상세 아카이브 주소)</label>
+                    <input 
+                      type="text" 
+                      value={formArchiveUrl}
+                      onChange={(e) => setFormArchiveUrl(e.target.value)}
+                      placeholder="예: github.com/username/project"
+                      className="w-full bg-zinc-950 border border-zinc-850 focus:border-sky-400 p-2 rounded text-zinc-200 focus:outline-none text-[11px]"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-zinc-500 mb-1 text-[10px]">BUTTON LABEL (외부 주소 버튼 명칭)</label>
+                    <input 
+                      type="text" 
+                      value={formArchiveLabel}
+                      onChange={(e) => setFormArchiveLabel(e.target.value)}
+                      placeholder="예: OPEN PROJECT LINK (미입력 시 기본값)"
+                      className="w-full bg-zinc-950 border border-zinc-850 focus:border-sky-400 p-2 rounded text-zinc-200 focus:outline-none text-[11px]"
+                    />
+                  </div>
+                </div>
               </div>
 
               {/* Portfolio Image Upload Zone */}
