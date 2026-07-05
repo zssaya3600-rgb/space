@@ -32,6 +32,7 @@ export interface Category {
   num: string;
   title: string;
   description: string;
+  image?: string; // Base64 or Blob URL for category project image upload
 }
 
 export interface LoggedUser {

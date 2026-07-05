@@ -1,325 +1,654 @@
 import { Category, Project } from "./types";
 
 export const defaultCategories: Category[] = [
-  { id: "01", num: "01", title: "Exhibition Space", description: "전시 공간 기획 & 관람 동선 디자인" },
-  { id: "02", num: "02", title: "Interior Design", description: "상업 및 가변형 실내 공간 레이아웃" },
-  { id: "03", num: "03", title: "SketchUp Modeling", description: "Enscape 실시간 렌더링 및 3D 모델링" },
-  { id: "04", num: "04", title: "CAD Drawing", description: "오토캐드 기반 정밀 평면/단면 설계 도면" },
-  { id: "05", num: "05", title: "VR Experience", description: "HMD 가상 시뮬레이션 및 공간 몰입 경험" },
-  { id: "06", num: "06", title: "Branding & Graphic", description: "전시 그래픽 및 공간 웨이파인딩 사인 시스템" },
-  { id: "07", num: "07", title: "Process Archive", description: "아이디어 스케치부터 설계 프로세스 아카이브" },
-  { id: "08", num: "08", title: "About Me", description: "공간 디자이너 김영준의 프로필 및 연락처" }
+  { id: "01", num: "01", title: "Featured Project ATLAS-1", description: "Urban Food Hub · Community Experience · Smart Farm System" },
+  { id: "02", num: "02", title: "Exhibition Research", description: "Museum · Media Art · Pop-up Store · Spatial Branding" },
+  { id: "03", num: "03", title: "Commercial Interior", description: "Academy · Cafe · Retail · Education Space" },
+  { id: "04", num: "04", title: "Residential Design", description: "House · Apartment · Lifestyle Space" },
+  { id: "05", num: "05", title: "3D Visualization", description: "SketchUp · Enscape · Rendering · Post Production" },
+  { id: "06", num: "06", title: "Design Process", description: "Sketch · Massing · Modeling · Material · Rendering" },
+  { id: "07", num: "07", title: "Competition Works", description: "Architecture · Space Concept · Presentation Panel" },
+  { id: "08", num: "08", title: "AI Workflow", description: "ChatGPT · AI Studio · Image Generation · Prompt Workflow" }
 ];
 
 export const defaultProjects: Project[] = [
+  // 01_ATLAS-1
   {
-    id: "ex-01",
+    id: "atlas-01",
     categoryId: "01",
-    title: "PROTOTYPE-V: Light & Sound Void Pavilion",
-    subtitle: "친환경 리사이클 루버를 적용한 전시용 무중력 파빌리온",
-    role: "Lead Spatial Planner & 3D Environment Modeler",
-    tools: ["SketchUp", "AutoCAD", "Enscape", "Photoshop"],
-    concept: "물리적 중력을 거스르는 '빛'과 '보이드'의 공존을 유도합니다. 가벼우면서도 견고한 재생 알루미늄 루버를 주 재료로 삼아, 빛의 투과율과 보는 각도에 따라 파사드가 변화하며 관람자에게 시각적 잔상을 부여하도록 기획했습니다.",
-    process: [
-      "Site Analysis: 전시장 외부 광원 및 동선 유입 경로 분석 (Circulation Analysis)",
-      "Zoning & Form Finding: 가변 벽체를 통한 3단 공간 조닝 (진입-몰입-잔향)",
-      "CAD Drafting: AutoCAD를 활용한 정밀 루버 고정 유닛 구조 상세도 설계",
-      "3D Modeling: SketchUp 컴포넌트를 활용하여 120개의 파사드 프레임 모델링",
-      "Rendering & Feedback: Enscape 조명 시뮬레이션을 거쳐 최적의 천장 슬릿 배치 확정"
-    ],
-    drawings: [
-      {
-        title: "전체 공간 동선 평면도 (Floor & Circulation Plan)",
-        description: "관람객의 병목 현상을 방지하기 위해 1.8m 이상의 일방통행(One-way) 순환 동선 구조로 설계되었으며, 주요 가구 배치를 오프셋하여 시각적 개방감을 유지했습니다.",
-        svgType: "exhibition-floor"
-      },
-      {
-        title: "외벽 루버 시공 단면 상세도 (Louver Connection Section)",
-        description: "경량 재생 알루미늄 파이프가 상하부 채널에 슬라이딩 형태로 고정되는 시공 방식으로 구조적 안정성과 가구 철거 시 재활용 가능성을 높였습니다.",
-        svgType: "detail-section"
-      }
-    ],
-    userFlow: [
-      { step: "Zone 1", title: "Welcome Tunnel (빛의 감쇠)", description: "외부 조도를 15lx 이하로 낮춘 진입로를 설계해, 동공의 이완을 유도하고 다가올 보이드 공간의 광학적 대비를 극대화합니다." },
-      { step: "Zone 2", title: "Immersive Void (중앙 광장)", description: "높이 4.5m의 천장 슬릿에서 떨어지는 자연광과 바닥의 거울 연못(Water Mirror)이 맞물려 무중력 공간과 같은 착시를 제공합니다." },
-      { step: "Zone 3", title: "Acoustic Reflection (사운드 존)", description: "흡음 패널과 흡음 타공 목재를 배면 처리하여 동선 유도 음향이 은은하게 감돌게 하고 브랜드의 핵심 메시지를 시각+청각적으로 인지하게 만듭니다." }
-    ],
-    materialLighting: {
-      materials: ["재생 프리즘 알루미늄 루버 (Prismatic Aluminum)", "스피겔 유리 바닥 (Mirror Floor Finish)", "노출 콘크리트 마감 플랙트 패널 (Eco-friendly Concrete Paint)"],
-      lighting: ["3000K 간접 광섬유 라인 조명", "4000K 천장 보이드 매립 슬림 라인 조명 (CRI 95+)", "바닥 조명용 스팟 에칭 라이팅 (Dimming Controlled)"],
-      description: "인위적인 직접 조명은 배제하고, 모든 구조적 조명은 바닥과 천장의 슬릿 내부에 숨겨진 매립식 라인 조명으로 구축하여 형태와 공간의 본질에 시선이 머물도록 조율했습니다."
-    },
-    renderingUrl: "exhibition_pavilion_rendering",
-    finalImageUrl: "exhibition_pavilion_final",
-    images: [
-      "https://images.unsplash.com/photo-1600585154340-be6161a56a0c?auto=format&fit=crop&w=1200&q=80",
-      "https://images.unsplash.com/photo-1600573472591-ee6b68d14c68?auto=format&fit=crop&w=1200&q=80",
-      "https://images.unsplash.com/photo-1600607687920-4e2a09cf159d?auto=format&fit=crop&w=1200&q=80"
-    ]
+    title: "01_Project Overview",
+    subtitle: "Urban Food Hub & Smart Farm System Concept",
+    role: "Exhibition Space Designer",
+    tools: ["AutoCAD", "SketchUp", "Enscape"],
+    concept: "도시 농업과 커뮤니티 공간을 연결하는 미래지향적 스마트 팜 플랫폼 제안.",
+    process: ["Site Survey", "Core Identity", "Space Planning", "Lobby Layout"],
+    drawings: [{ title: "Overall Layout Plan", description: "전체 층별 동선 레이아웃 및 영역 구획 도면", svgType: "exhibition-floor" }],
+    userFlow: [{ step: "Zone A", title: "Intro Foyer", description: "스마트 팜 기술 소개 전초 영역" }],
+    materialLighting: { materials: ["Steel", "Tempered Glass", "Concrete"], lighting: ["4000K Line LED"], description: "구조미를 살린 산업용 금속 프레임과 매립 조명" },
+    renderingUrl: "atlas_01_rendering",
+    finalImageUrl: "atlas_01_final",
+    images: []
   },
   {
-    id: "ex-02",
+    id: "atlas-02",
     categoryId: "01",
-    title: "NEXUS: Future Mobility Pavilion",
-    subtitle: "유선형 스트림라인을 모티브로 삼은 친환경 자율주행 모빌리티 전시관",
-    role: "Exhibition Planner & AutoCAD Draftsman",
-    tools: ["AutoCAD", "SketchUp", "Photoshop", "Illustrator"],
-    concept: "단순한 이동수단의 전시를 넘어, 차량과 공간이 교감하는 가상의 도시 그리드를 제안합니다. 동선 흐름(Streamline)을 벽면의 라인 조명과 연계하여, 마치 관람자가 자율주행 회로 속에 타고 흐르는 듯한 유기적인 경험을 구현했습니다.",
-    process: [
-      "Research: 자율주행 센서 피드백 및 모빌리티 인터랙티브 동선 기획",
-      "Zoning Layout: 모빌리티 도크, 미디어 아카이브, 체험 콕핏 존 배정",
-      "Slab Load Study: 대형 기기 전시를 위한 하부 구조 프레임 강화 및 바닥 하중 분산 설계",
-      "Visual Graphics: 동선 바닥 유도선 그래픽 및 타이포 패널 제작"
-    ],
-    drawings: [
-      {
-        title: "동선 및 조닝 구성도 (Zoning & Layout Plan)",
-        description: "센서 인터랙션을 위한 충분한 이격 거리를 계산하여 동선 폭을 2.5m로 확보하고, 대형 모빌리티가 중앙에 안착할 수 있도록 구성했습니다.",
-        svgType: "retail-layout"
-      }
-    ],
-    userFlow: [
-      { step: "Step 1", title: "Velocity Check-In", description: "관람객의 RFID 태그를 매핑하여 바닥의 동선 라이트가 사용자 전용 색상으로 가이드라인을 제공합니다." },
-      { step: "Step 2", title: "Kinetic Grid Space", description: "가변 기둥 리깅과 키네틱 미디어가 연동되어 가벼운 부피감을 시각적으로 전합니다." }
-    ],
-    materialLighting: {
-      materials: ["헤어라인 스테인리스 스틸", "미러 아크릴 패널", "친환경 저탄소 자갈 테라조 마감"],
-      lighting: ["스마트 RGBW 가변 무빙 라인 LED", "바닥 전면 매립형 스트림 패널 바 (4000K)"],
-      description: "차갑고 미래적인 알루미늄/스테인리스 스틸 질감에 따스한 테라조 소재를 조합하여 조화로운 균형을 맞췄습니다."
-    },
-    renderingUrl: "mobility_pavilion_rendering",
-    finalImageUrl: "mobility_pavilion_final",
-    images: [
-      "https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?auto=format&fit=crop&w=1200&q=80",
-      "https://images.unsplash.com/photo-1518005020951-eccb494ad742?auto=format&fit=crop&w=1200&q=80",
-      "https://images.unsplash.com/photo-1511818966892-d7d671e672a2?auto=format&fit=crop&w=1200&q=80"
-    ]
+    title: "02_Site Analysis",
+    subtitle: "Micro-climate & Architectural Grid Context",
+    role: "Spatial Planner",
+    tools: ["AutoCAD", "Illustrator"],
+    concept: "지리적 조건과 일조량, 사람들의 접근 흐름 분석을 통한 최적 배치 계획.",
+    process: ["Solar study", "Traffic Flow", "Wind Pattern Analysis"],
+    drawings: [{ title: "Site Integration Map", description: "주변 컨텍스트 및 사이트 분석 도면", svgType: "exhibition-floor" }],
+    userFlow: [{ step: "Analysis", title: "Context Check", description: "대지 진입 유동 인구 흐름 파악" }],
+    materialLighting: { materials: ["Perforated Panel", "Laminated Glass"], lighting: ["Dynamic Accent Spot"], description: "시간에 따른 분석용 외부 조도 연출" },
+    renderingUrl: "atlas_02_rendering",
+    finalImageUrl: "atlas_02_final",
+    images: []
   },
   {
-    id: "in-01",
-    categoryId: "02",
-    title: "ARCHIVE 24: Workspace & Lounge Studio",
-    subtitle: "전시와 휴식이 가변적으로 레이어링되는 복합 오피스 공간",
-    role: "Interior Designer & Space Layout Strategist",
+    id: "atlas-03",
+    categoryId: "01",
+    title: "03_Concept",
+    subtitle: "Symbiosis of Technology and Nature",
+    role: "Lead Concept Creator",
+    tools: ["Hand Sketch", "Photoshop"],
+    concept: "기술과 자연의 유기적인 공존을 시각화하는 보이드 공간 연출 기획.",
+    process: ["Ideation Sketch", "Mass Validation", "Form Study"],
+    drawings: [{ title: "Concept Diagram", description: "자연 광선 도입 및 기류 순환을 표현한 단면 다이어그램", svgType: "detail-section" }],
+    userFlow: [{ step: "Core", title: "The Void Experience", description: "빛과 소리가 조화되는 중앙 비움의 가치 전달" }],
+    materialLighting: { materials: ["Raw Timber", "Anodized Aluminum"], lighting: ["Indirect Cove Light"], description: "인위적인 기술 조명 대신 자연 광선 반사 구조 기획" },
+    renderingUrl: "atlas_03_rendering",
+    finalImageUrl: "atlas_03_final",
+    images: []
+  },
+  {
+    id: "atlas-04",
+    categoryId: "01",
+    title: "04_User Scenario",
+    subtitle: "Circulation Flow & Activity Mapping",
+    role: "Experience Designer",
+    tools: ["Illustrator", "Figma"],
+    concept: "관람자, 관리자, 연구원으로 세분화된 맞춤형 이용자 시나리오 디자인.",
+    process: ["Persona Definition", "Touchpoint Mapping", "Timeline Analysis"],
+    drawings: [{ title: "Scenario Route Overlay", description: "동선 간 충돌을 방지하는 분리형 평면 오버레이", svgType: "retail-layout" }],
+    userFlow: [{ step: "Route 1", title: "Visitor Journey", description: "체험형 수확 공간에서 F&B 라운지로 이어지는 자연스러운 흐름" }],
+    materialLighting: { materials: ["Interactive Surface", "Resin Terrazzo"], lighting: ["Smart Guideline LED"], description: "바닥 조명이 사용자의 이동 상태에 맞춰 유동적으로 변화" },
+    renderingUrl: "atlas_04_rendering",
+    finalImageUrl: "atlas_04_final",
+    images: []
+  },
+  {
+    id: "atlas-05",
+    categoryId: "01",
+    title: "05_Zoning",
+    subtitle: "Volumetric Space Allocation",
+    role: "Space Architect",
+    tools: ["SketchUp", "Rhino"],
+    concept: "소음 및 오염 방지를 위해 스마트 팜 재배지, 연구실, 공용 커뮤니티 구역의 고밀도 조닝 수립.",
+    process: ["Volume Mass Block", "Acoustic Insulation Design", "Service Core Allocation"],
+    drawings: [{ title: "3D Volumetric Zoning", description: "수직 복층화 공간 활용도를 나타낸 3D 단면도", svgType: "minimal-lounge" }],
+    userFlow: [{ step: "Vertical", title: "Zoning Split", description: "저층부 공용 라운지, 고층부 연구/생산 구역 분리" }],
+    materialLighting: { materials: ["Sound-absorbent Foam", "Clear Glass Partition"], lighting: ["Task Lighting Layout"], description: "각 실의 목적에 부합하는 독립 조도 제어 시스템" },
+    renderingUrl: "atlas_05_rendering",
+    finalImageUrl: "atlas_05_final",
+    images: []
+  },
+  {
+    id: "atlas-06",
+    categoryId: "01",
+    title: "06_Circulation",
+    subtitle: "Ramp and Core Structural Navigation",
+    role: "Circulation Specialist",
+    tools: ["AutoCAD", "SketchUp"],
+    concept: "휠체어 사용자도 편하게 전 층을 이동할 수 있는 나선형 관람 램프 설계 및 중심 코어 배치.",
+    process: ["Slope Calculation", "Emergency Exit Route", "Vertical Core Integration"],
+    drawings: [{ title: "Ramp Section Details", description: "나선형 램프의 높이별 경사도 및 보행선 기준 상세 평면도", svgType: "exhibition-floor" }],
+    userFlow: [{ step: "Rise", title: "Continuous Ascent", description: "끊김 없는 계단 없는 동선 구조 시뮬레이션" }],
+    materialLighting: { materials: ["Non-slip Decking", "Glass Balustrade"], lighting: ["Handrail Integrated LED"], description: "난간 매립 하향식 안전 유도등 설계" },
+    renderingUrl: "atlas_06_rendering",
+    finalImageUrl: "atlas_06_final",
+    images: []
+  },
+  {
+    id: "atlas-07",
+    categoryId: "01",
+    title: "07_Space Planning",
+    subtitle: "Interior Layout & Spatial Detail Design",
+    role: "Space & Exhibition Designer",
+    tools: ["AutoCAD", "SketchUp"],
+    concept: "실제 부품 수납 및 전시 매대 설계 규격을 맞춘 가구 계획과 기획 설계 디테일.",
+    process: ["Furniture Layout", "Ergonomics Study", "Custom Joinery Draft"],
+    drawings: [{ title: "Lounge Space Detail Layout", description: "가구 집기 평면도 및 집기 상세 제작 도면", svgType: "minimal-lounge" }],
+    userFlow: [{ step: "Interact", title: "Touchpoint Zone", description: "바 카운터와 맞춤 수납 가구 높이에 최적화된 편안함 제공" }],
+    materialLighting: { materials: ["White Oak Vencer", "Powder-coated Steel"], lighting: ["3000K Pendant Fitting"], description: "편안한 분위기를 유도하는 따뜻한 펜던트 웜 톤 조명" },
+    renderingUrl: "atlas_07_rendering",
+    finalImageUrl: "atlas_07_final",
+    images: []
+  },
+  {
+    id: "atlas-08",
+    categoryId: "01",
+    title: "08_Rendering",
+    subtitle: "Enscape Real-time Rendering Production",
+    role: "3D Visualizer",
     tools: ["SketchUp", "Enscape", "Photoshop"],
-    concept: "낮에는 오픈 워크스페이스로 활용되고, 저녁에는 신제품 팝업 전시 쇼룸으로 변환되는 2Way 레이아웃 프로젝트입니다. 회전식 회전벽(Pivot Wall)을 적용해 간단한 조작만으로 오피스가 완전한 무대 전시장으로 탈바꿈하는 영리한 조닝을 추구했습니다.",
-    process: [
-      "Concept Development: 공유 오피스 트렌드 및 가변 메커니즘 리서치",
-      "Pivot Wall Modeling: 회전 반경을 정밀 계산한 1:1 디테일 스케치업 검증",
-      "Color Palette Definition: 뉴트럴 웜그레이와 실버 스틸을 조합한 차분하고 세련된 톤 앤 매너 설계"
-    ],
-    drawings: [
-      {
-        title: "회전벽 적용 가변 평면도 (Flexible Floor Plan Layout)",
-        description: "피벗 도어 가동 시의 데드 스페이스를 최소화하고, 전시 모드와 사무 모드 각 상황에 맞는 안전 피난 동선(Egress)을 동시에 확보했습니다.",
-        svgType: "minimal-lounge"
-      }
-    ],
-    userFlow: [
-      { step: "Mode A", title: "Day: Collaborative Workspace", description: "피벗 월이 격자 형태로 배치되어 부서 간 독립적인 워크 그룹과 집중도를 제공합니다." },
-      { step: "Mode B", title: "Night: Open Gallery Workspace", description: "모든 피벗 월이 벽면 평행으로 회전해 80평 규모의 시원한 갤러리로 전환되며 조명이 일제히 전시 무드로 변환됩니다." }
-    ],
-    materialLighting: {
-      materials: ["자작나무 플라이우드", "무광 에폭시 수지 마감", "샌드블라스트 유리 파티션"],
-      lighting: ["실린더 형태 레일 스포트라이트 (Dimmer)", "구역 분할 조도 스위칭 모듈"],
-      description: "자연 소재인 자작나무에 산업용 유리와 마감을 더하여 내구성과 편안함을 극대화했습니다."
-    },
-    renderingUrl: "workspace_rendering",
-    finalImageUrl: "workspace_final",
-    images: [
-      "https://images.unsplash.com/photo-1497366216548-37526070297c?auto=format&fit=crop&w=1200&q=80",
-      "https://images.unsplash.com/photo-1497366811353-6870744d04b2?auto=format&fit=crop&w=1200&q=80",
-      "https://images.unsplash.com/photo-1524758631624-e2822e304c36?auto=format&fit=crop&w=1200&q=80"
-    ]
+    concept: "자연 채광과 금속 루버의 교차가 자아내는 역동적인 내부 깊이감을 최고 사양으로 렌더링.",
+    process: ["Material Optimization", "Sun Position Setup", "Post Processing"],
+    drawings: [{ title: "Render Camera Angles", description: "카메라 시선 및 광각 왜곡 방지 앵커 플랜", svgType: "vr-gallery" }],
+    userFlow: [{ step: "Visualize", title: "Perspective View", description: "스케일 피플 배치를 통한 리얼리티 증진" }],
+    materialLighting: { materials: ["Polished Marble", "Brushed Metal"], lighting: ["HDRI Sky System", "IES Spot Profiles"], description: "리얼타임 엔진의 특성을 살린 정교한 배광 데이터 반사 연출" },
+    renderingUrl: "atlas_08_rendering",
+    finalImageUrl: "atlas_08_final",
+    images: []
   },
   {
-    id: "sk-01",
-    categoryId: "03",
-    title: "THE GRID: Modular Retail Flagship Store",
-    subtitle: "격자 그리드를 이용한 브랜딩 결합 플래그십 매스 스터디",
-    role: "3D Modeling Expert & Rendering Artist",
-    tools: ["SketchUp", "Enscape", "Illustrator"],
-    concept: "가장 기본이 되는 기하학 도형인 '정육면체 그리드'의 중첩과 생략을 통해 조형성 있는 수납 공간 and 디스플레이 쇼케이스를 창출했습니다. 가벼운 수직 철골 프레임과 무거운 콘크리트 플랫폼의 대비를 강조하여 시각적 긴장감을 연출했습니다.",
-    process: [
-      "Grid Setup: 600x600x600 모듈러 유닛 기반 레이아웃 기획",
-      "SketchUp Componentization: 스케치업 컴포넌트화를 통해 수천 개의 그리드를 최적화 모델링하여 파일 용량 단축 및 작업 속도 비약적 향상",
-      "Material Realism: Enscape 상에서 러프 텍스처와 미세 범프 맵(PBR)을 적용한 하이엔드 실재감 구현"
-    ],
-    drawings: [
-      {
-        title: "스케치업 3D 아이소메트릭 그리드 (3D Axonometric Grid Plan)",
-        description: "정밀한 그리드가 수직, 수평으로 뻗어 나가며 계단식 구조를 형성하고, 브랜드 상품의 디스플레이 높낮이를 과학적으로 설계한 아이소메트릭 도면입니다.",
-        svgType: "retail-layout"
-      }
-    ],
-    userFlow: [
-      { step: "Entrance", title: "Low-density Welcome Area", description: "그리드의 밀도를 극도로 낮추어 넓은 개방감을 제공하고, 전시 플래그십 스토어의 대표 랜드마크 요소를 맞닥뜨리게 합니다." },
-      { step: "Browse", title: "High-density Grid Showroom", description: "그리드가 촘촘하게 배열되어 동선이 자연스럽게 지그재그 형태로 굽이치며 유입되어 관람자의 제품 체류 시간(Dwell Time)을 유도합니다." }
-    ],
-    materialLighting: {
-      materials: ["헤어라인 스테인리스 스틸 파이프", "마이크로시멘트 노출콘크리트", "투명 폴리카보네이트 복층판"],
-      lighting: ["그리드 하부 매립형 확산 LED 스트립", "소형 주광색 스포트라이트"],
-      description: "그리드 프레임 하단에 매립된 간접 광원으로 철골 구조가 허공에 떠 있는 듯한 플로팅 효과를 유도했습니다."
-    },
-    renderingUrl: "modular_retail_rendering",
-    finalImageUrl: "modular_retail_final",
-    images: [
-      "https://images.unsplash.com/photo-1600607687939-ce8a6c25118c?auto=format&fit=crop&w=1200&q=80",
-      "https://images.unsplash.com/photo-1600566753376-12c8ab7fb75b?auto=format&fit=crop&w=1200&q=80",
-      "https://images.unsplash.com/photo-1513519245088-0e12902e5a38?auto=format&fit=crop&w=1200&q=80"
-    ]
-  },
-  {
-    id: "cad-01",
-    categoryId: "04",
-    title: "MUSEUM MAIN HALL: Execution Drawing Pack",
-    subtitle: "설계 구현 가능성에 초점을 맞춘 미술관 메인 전시홀 도면집",
-    role: "AutoCAD CAD Draftsman",
+    id: "atlas-09",
+    categoryId: "01",
+    title: "09_System",
+    subtitle: "Hydroponic & Lighting Automation Layout",
+    role: "Smart Farm Engineer Collaboration",
     tools: ["AutoCAD", "Excel"],
-    concept: "디자이너의 아이디어가 실제 현장에서 숙련된 시공팀에 의해 완벽히 구현되도록 치수와 기호체계를 국제 표준에 부합하게 작성한 실시도면 세트입니다. 벽체의 레이어 단면, 소방 피난 동선 피치, 매립 조명의 전기 아웃렛 배치까지 철저히 반영했습니다.",
-    process: [
-      "Base Map Cleanup: 원본 건축 도면 스케일 및 정렬 오류 디텍팅 및 수정",
-      "Ceiling Coordination: 환기 덕트, 에어컨, 전동 레일, 스프링클러 헤드와 조명 조율",
-      "Drawing Compilation: 평면, 입면, 천정, 상세 단면을 포괄하는 PDF 아카이브 일원화"
-    ],
-    drawings: [
-      {
-        title: "오토캐드 미술관 메인홀 상세 평면도 (CAD Floor Layout)",
-        description: "가벽 두께 150mm를 기준으로 마감선을 디테일하게 작도하고 도어 방향, 중심선, 통행 기준선 등 시공 필수 치수를 오차 없이 삽입했습니다.",
-        svgType: "exhibition-floor"
-      },
-      {
-        title: "전시 파티션 월 상세 단면 상세도 (Partition Wall Section)",
-        description: "스터드 골조 내부에 전시 하중 지지용 12mm 합판 보강 레이어를 상세 표기하여 대형 회화 및 설치 조각물이 낙하할 위험이 없도록 시공 구조를 표기했습니다.",
-        svgType: "detail-section"
-      }
-    ],
-    userFlow: [
-      { step: "Drawing 1", title: "전시관 평면도 (Circulation Floor Plan)", description: "동선의 교차점을 최소화하여 코로나 시기 이후 안심 관람이 가능한 교행 동선을 규격화했습니다." },
-      { step: "Drawing 2", title: "조명 배선 및 천정도 (Reflected Ceiling Plan)", description: "무대 연출을 극대화하도록 전동식 레일 서포트 조명 위치를 600mm 격자로 타공하는 도면 레이아웃입니다." }
-    ],
-    materialLighting: {
-      materials: ["12T 차음 석고보드 더블 레이어", "백색 친환경 안티스타코 페인트 마감", "방염 처리 집성 자재 원목 바닥재"],
-      lighting: ["CRI 97+ 전시 전용 레일 다운스팟", "천장 외곽 T-5 간접 조명 바커스"],
-      description: "시공 시 방염 기준 통과와 작품 오염 방지를 위해 저휘발성 유기화합물 자재 및 자외선 방출이 완벽 차단되는 LED 칩셋 규격을 도면 명세에 상세히 박아 넣었습니다."
-    },
-    renderingUrl: "cad_drawing_rendering",
-    finalImageUrl: "cad_drawing_final",
-    images: [
-      "https://images.unsplash.com/photo-1554907984-15263bfd63bd?auto=format&fit=crop&w=1200&q=80",
-      "https://images.unsplash.com/photo-1600585154526-990dced4db0d?auto=format&fit=crop&w=1200&q=80",
-      "https://images.unsplash.com/photo-1569003339405-ea396a5a8a90?auto=format&fit=crop&w=1200&q=80"
-    ]
+    concept: "식물 성장에 필요한 청색/적색 스펙트럼의 LED 재배 등기구 및 급배수관 통합 천장 도면 설계.",
+    process: ["Piping Routing", "Grow Lights Layout", "HVAC Ducting Check"],
+    drawings: [{ title: "Grow Light Control Layout", description: "설비 및 전기 배선 통합 천장 반사도(RCP)", svgType: "detail-section" }],
+    userFlow: [{ step: "Automate", title: "Cycle Monitoring", description: "식물 수확기별 순차적 점등 시퀀스" }],
+    materialLighting: { materials: ["PVC Pipes", "Grow LED Fixtures"], lighting: ["Spectrum Adjustable Grow LED"], description: "수경 재배 전용 식물 육성 스마트 광원 적용" },
+    renderingUrl: "atlas_09_rendering",
+    finalImageUrl: "atlas_09_final",
+    images: []
   },
   {
-    id: "vr-01",
+    id: "atlas-10",
+    categoryId: "01",
+    title: "10_Final Presentation",
+    subtitle: "Portfolio Package & Exhibition Board",
+    role: "Graphic & Spatial Storyteller",
+    tools: ["Indesign", "Illustrator", "Photoshop"],
+    concept: "종합적인 설계 프로세스, 동선, 3D 렌더링을 한눈에 담은 패널과 레이아웃 구성.",
+    process: ["Board Grid Design", "Hierarchy Adjustments", "Typography Pairing"],
+    drawings: [{ title: "Exhibition Board Layout", description: "A0 사이즈 프레젠테이션 보드 편집 도면", svgType: "retail-layout" }],
+    userFlow: [{ step: "Present", title: "Final Evaluation", description: "기획 의도가 직관적으로 수용자에게 다가가는 흐름" }],
+    materialLighting: { materials: ["High-density Matte Foam Board"], lighting: ["CRI 95 Museum Track Spot"], description: "실제 오프라인 심사용 패널 전용 고연색 조명 조율" },
+    renderingUrl: "atlas_10_rendering",
+    finalImageUrl: "atlas_10_final",
+    images: []
+  },
+
+  // 02_EXHIBITION_RESEARCH
+  {
+    id: "exres-01",
+    categoryId: "02",
+    title: "01_Museum Research",
+    subtitle: "Spatial Archive & Circulation Analysis",
+    role: "Museum Planner",
+    tools: ["Research Deck", "Figma"],
+    concept: "국내외 주요 미술관의 동선 흐름 분석 및 전시 가벽 형태 연구.",
+    process: ["Case Study", "Circulation Mapping"],
+    drawings: [{ title: "Museum Flow Study", description: "선형 동선과 자유동선의 가벽 구조 비교도", svgType: "exhibition-floor" }],
+    userFlow: [{ step: "Inflow", title: "Frictionless Passage", description: "정체 구간을 최소화하는 전시실 크기 산정" }],
+    materialLighting: { materials: ["Acoustic Plasterboard"], lighting: ["Diffuse Ceiling Light"], description: "작품 집중에 방해 없는 균일한 무지향성 확산광" },
+    renderingUrl: "exres_01_rendering",
+    finalImageUrl: "exres_01_final",
+    images: []
+  },
+  {
+    id: "exres-02",
+    categoryId: "02",
+    title: "02_Media Art Research",
+    subtitle: "Darkroom Setup & Projector Lux Study",
+    role: "Media Space Designer",
+    tools: ["Reconstruct Study", "Enscape"],
+    concept: "미디어 아트 프로젝터 투사 거리 및 암막 챔버 반사율을 고려한 공간 계획.",
+    process: ["Lux Calculation", "Acoustic Dampening Layout"],
+    drawings: [{ title: "Projector Throw Angle Plan", description: "사각지대 없는 매립 프로젝터 배치 및 사선 설계안", svgType: "vr-gallery" }],
+    userFlow: [{ step: "Immerse", title: "Black Box Entry", description: "빛의 전이를 통한 완벽한 암전 환경 도달" }],
+    materialLighting: { materials: ["Matt Black Flocking Paint"], lighting: ["Zero Direct Light", "Laser Projection"], description: "난반사를 줄이기 위한 무반사 마감과 조화" },
+    renderingUrl: "exres_02_rendering",
+    finalImageUrl: "exres_02_final",
+    images: []
+  },
+  {
+    id: "exres-03",
+    categoryId: "02",
+    title: "03_Pop-up Store Research",
+    subtitle: "Experiential Retail Design Study",
+    role: "Spatial Branding Consultant",
+    tools: ["Trend Report", "Illustrator"],
+    concept: "MZ세대의 포토존 선호 유형 및 단기 체류성 팝업 스토어 가설 가벽 공간 설계 분석.",
+    process: ["Insta-point Analysis", "Rapid Assembly Structure Study"],
+    drawings: [{ title: "Pop-up Retail Modular Plan", description: "3일 내 철거 및 조립이 가능한 프레임 모듈 도면", svgType: "retail-layout" }],
+    userFlow: [{ step: "Attract", title: "Visual Magnet Zone", description: "길 가던 행인의 이목을 끄는 전면 쇼윈도 포토제닉 공간" }],
+    materialLighting: { materials: ["Recyclable Acrylic", "Neon Flexible LED"], lighting: ["RGB Dynamic Control"], description: "브랜드 색감을 극대화하는 반응형 가변 컬러 네온 연출" },
+    renderingUrl: "exres_03_rendering",
+    finalImageUrl: "exres_03_final",
+    images: []
+  },
+  {
+    id: "exres-04",
+    categoryId: "02",
+    title: "04_Spatial Branding",
+    subtitle: "Translating Brand Identity into Physical Space",
+    role: "Brand Architect",
+    tools: ["Illustrator", "SketchUp"],
+    concept: "무형의 브랜드 톤앤매너를 가구 형상, 마감 자재, 디테일 메탈 구조로 물리 공간에 정밀 이식.",
+    process: ["Curation Matrix", "Material Identity Design"],
+    drawings: [{ title: "Brand Identity Layout", description: "로고 각인 및 브랜드 로고타입 비례를 맞춘 파사드 상세 설계", svgType: "exhibition-floor" }],
+    userFlow: [{ step: "Experience", title: "Touch Brand", description: "브랜드의 촉각적 가치를 느끼는 인포메이션 데스크" }],
+    materialLighting: { materials: ["Brushed Brass", "Raw Concrete"], lighting: ["Logo Backlit LED"], description: "고급스러움을 표출하는 황동 뒤 은은한 백라이트 효과" },
+    renderingUrl: "exres_04_rendering",
+    finalImageUrl: "exres_04_final",
+    images: []
+  },
+  {
+    id: "exres-05",
+    categoryId: "02",
+    title: "05_Exhibition Experience Analysis",
+    subtitle: "Spatial Experience Curation Theory",
+    role: "Exhibition Curator",
+    tools: ["Data Chart", "Excel"],
+    concept: "전시 시나리오에 따른 관람자 시선 각도, 피로도 축적 지점 등을 공간적으로 연역하는 시뮬레이션.",
+    process: ["Eyeline Study", "Rest Area Optimization Plan"],
+    drawings: [{ title: "Visitor Sightline Chart", description: "전시물 걸리는 높이 표준 및 시선 유도 평단면 계획", svgType: "detail-section" }],
+    userFlow: [{ step: "Rest", title: "Breathing Point", description: "전시 피로도를 상쇄해줄 수 있는 벤치와 조명 계획 접목" }],
+    materialLighting: { materials: ["Natural Linen Cushion", "Acoustic Wall Panels"], lighting: ["Low Glare 2700K Warm Spot"], description: "눈에 피로가 가지 않도록 눈부심 방지 렌즈 탑재 조명 배치" },
+    renderingUrl: "exres_05_rendering",
+    finalImageUrl: "exres_05_final",
+    images: []
+  },
+
+  // 03_COMMERCIAL_INTERIOR
+  {
+    id: "com-01",
+    categoryId: "03",
+    title: "01_Academy Interior",
+    subtitle: "High-focus Modern Education Academy Study",
+    role: "Interior Spatial Designer",
+    tools: ["AutoCAD", "SketchUp", "Enscape"],
+    concept: "학업 집중도와 자유로운 소통이 공존하는 가변형 미팅 테라스형 학원 인테리어 공간 기획.",
+    process: ["Desks Array Optimization", "Noise Control Study"],
+    drawings: [{ title: "Academy Floor Plan", description: "강의실, 독서실, 인포 데스크 치수 완벽 작도 평면도", svgType: "exhibition-floor" }],
+    userFlow: [{ step: "Focus", title: "Individual Zone", description: "시야를 적절히 차단하고 소음을 흡수하는 마감 기법 적용" }],
+    materialLighting: { materials: ["Carpet Tile", "Birch Plywood"], lighting: ["5000K Flat LED Panel"], description: "눈의 피로가 덜한 완전 주백색 주백광 조명" },
+    renderingUrl: "com_01_rendering",
+    finalImageUrl: "com_01_final",
+    images: []
+  },
+  {
+    id: "com-02",
+    categoryId: "03",
+    title: "02_Cafe Interior",
+    subtitle: "Minimal Espresso Bar Concept",
+    role: "Lead Space Designer",
+    tools: ["SketchUp", "Photoshop"],
+    concept: "거친 콘크리트 마감과 극도로 세련된 금속 소재가 결합된 초소형 미니멀 에스프레소 바 기획.",
+    process: ["Bar Counter Ergonomics", "Kitchen Flow Study"],
+    drawings: [{ title: "Bar Section & Elevation", description: "바리스타 동선과 장비 배치를 맞춘 가구 제작 상세 단면도", svgType: "retail-layout" }],
+    userFlow: [{ step: "Enjoy", title: "Quick Bar Experience", description: "스탠딩 테이블에서 바로 에스프레소를 즐기는 흐름" }],
+    materialLighting: { materials: ["Stainless Steel 304", "Raw Terrazzo"], lighting: ["Under-counter Warm LED"], description: "메탈의 차가움을 중화시키는 하단 은은한 오렌지빛 조명 연출" },
+    renderingUrl: "com_02_rendering",
+    finalImageUrl: "com_02_final",
+    images: []
+  },
+  {
+    id: "com-03",
+    categoryId: "03",
+    title: "03_Retail Space",
+    subtitle: "Premium Lifestyle Select Shop Layout",
+    role: "Retail Space Planner",
+    tools: ["AutoCAD", "SketchUp"],
+    concept: "모듈 가구를 이용해 매월 자유롭게 공간을 리뉴얼할 수 있는 하이엔드 편집숍 제안.",
+    process: ["Modular Furniture Design", "Display Shelf Plan"],
+    drawings: [{ title: "Flexible Display Floor Map", description: "가구 유닛 가동 반경 및 배치를 나타낸 조닝 평면도", svgType: "minimal-lounge" }],
+    userFlow: [{ step: "Attract", title: "Curation Table", description: "고객 입구 바로 앞에서 시즌별 핵심 큐레이션 제품 제공" }],
+    materialLighting: { materials: ["Micro-cement", "Frosted Glass"], lighting: ["Adjustable Track Lights"], description: "진열 제품의 입체감을 표현하기 위한 가변 레일 스팟" },
+    renderingUrl: "com_03_rendering",
+    finalImageUrl: "com_03_final",
+    images: []
+  },
+
+  // 04_RESIDENTIAL_PROJECT
+  {
+    id: "res-01",
+    categoryId: "04",
+    title: "01_Pangyo House",
+    subtitle: "High-end Multi-generation Villa Project",
+    role: "Residential Interior Designer",
+    tools: ["AutoCAD", "SketchUp", "Enscape"],
+    concept: "판교 복층 단독주택을 위한 프라이빗하고 세련된 가족 친화형 공간 설계 및 리모델링 제안.",
+    process: ["Living Room Restructuring", "Kitchen Integration Plan"],
+    drawings: [{ title: "1st & 2nd Floor Plan", description: "가족 침실과 공용 거실의 수직적 동선을 맞춘 치수 평면도", svgType: "exhibition-floor" }],
+    userFlow: [{ step: "Enter", title: "Grand Vestibule", description: "현관을 지나 긴 보이드 계단식 거실로 이어지는 웅장한 연출" }],
+    materialLighting: { materials: ["Travertine Stone", "Walnut Panel"], lighting: ["Lutron Dimming Control System"], description: "시간 및 활동 유형별 감성 웰컴 라이팅 기획" },
+    renderingUrl: "res_01_rendering",
+    finalImageUrl: "res_01_final",
+    images: []
+  },
+  {
+    id: "res-02",
+    categoryId: "04",
+    title: "02_Space Planning",
+    subtitle: "Ergonomic Layout & Storage Solutions",
+    role: "Storage System Planner",
+    tools: ["AutoCAD"],
+    concept: "가변 수납형 수납 시스템 및 데드스페이스를 완벽히 제거한 가벽 매립 옷장 세부 설계.",
+    process: ["Dead Space Analysis", "Built-in Wardrobe Specs"],
+    drawings: [{ title: "Wardrobe Joinery Section", description: "천장고와 수납 비례를 계산한 가구 제작 정밀 입면/단면 도면", svgType: "detail-section" }],
+    userFlow: [{ step: "Organize", title: "Utility Flow", description: "세탁 존에서 옷방으로 이어지는 효율적인 집안일 동선 최소화" }],
+    materialLighting: { materials: ["E0 Melamine Wood", "Alu Handle"], lighting: ["Internal Wardrobe LED Strip"], description: "도어를 열면 작동하는 내부 감지형 라인 조명 탑재" },
+    renderingUrl: "res_02_rendering",
+    finalImageUrl: "res_02_final",
+    images: []
+  },
+  {
+    id: "res-03",
+    categoryId: "04",
+    title: "03_Rendering",
+    subtitle: "High-fidelity Residential Living Space Visualization",
+    role: "Rendering Specialist",
+    tools: ["Enscape", "Photoshop"],
+    concept: "천연 대리석의 자연스러운 패턴과 가죽 텍스처의 오염도를 완벽 표현한 사실적인 렌더링 제작.",
+    process: ["PBR Texturing", "Ambient Occlusion Setup"],
+    drawings: [{ title: "Daylight Raytrace Chart", description: "일출부터 일몰까지 시간대별 그림자 쉐이더 가이드 도면", svgType: "vr-gallery" }],
+    userFlow: [{ step: "See", title: "Warm Living View", description: "창 밖 조경과 간접 조명이 완벽한 밸런스를 맞춘 뷰" }],
+    materialLighting: { materials: ["Travertine Marble", "Calf Leather Fabric"], lighting: ["HDRI Sunset Simulation"], description: "석양빛의 따뜻하고 긴 그림자를 시뮬레이션한 시각화" },
+    renderingUrl: "res_03_rendering",
+    finalImageUrl: "res_03_final",
+    images: []
+  },
+
+  // 05_3D_VISUALIZATION
+  {
+    id: "vis-01",
     categoryId: "05",
-    title: "BOUNDLESS: Virtual Reality Art Gallery",
-    subtitle: "물리적 공간 한계를 초월하는 스케일의 가상 VR 전시장 시뮬레이션",
-    role: "VR Space Programmer & Environment Modeler",
-    tools: ["SketchUp", "VR Headset Tool", "Enscape VR", "Twinmotion"],
-    concept: "가상 현실 내에서 관람객이 공간감을 잃지 않고 최적의 편안함 속에서 작품에 집중할 수 있도록 '인간공학적 랜드마크'와 'Gaze Anchor(시선 앵커)' 기술을 배치한 가상 갤러리 전시입니다.",
-    process: [
-      "User Behavior Analysis: 헤드셋 착용자의 시점 이동 속도 및 멀미 저항 반경 검출",
-      "Spatial Anchor Deployment: 꺾어지는 굽은 지점마다 높이 6m의 대형 모뉴먼트를 배치하여 현재 위치를 가늠할 수 있게 공간 좌표화",
-      "Stereoscopic Rendering: 좌우 양안 렌즈에 대응하는 4K 스테레오 파노라마 렌즈 렌더링 셋업"
-    ],
-    drawings: [
-      {
-        title: "VR 전용 시각적 앵커 평면 배치도 (VR Spatial Anchoring Layout)",
-        description: "가상공간에서 헤매지 않고, 주 시선(Line of Sight)이 자연스럽게 흐르도록 설계된 앵커 스팟을 입체적으로 표시한 도면입니다.",
-        svgType: "vr-gallery"
-      }
-    ],
-    userFlow: [
-      { step: "Portal", title: "Calibration Zone (조율 공간)", description: "관람자가 헤드셋을 착용한 직후 원통형 방에 배치되어, 밝기와 소리 밸런스에 귀와 눈을 조율(Adapting)하도록 기획된 공간입니다." },
-      { step: "Navigate", title: "Continuous Floating Path", description: "계단이 없는 완만한 나선형 램프를 설계하여, VR 컨트롤러 조작 미숙으로 인한 멀미 유발 요인을 원천 봉쇄했습니다." }
-    ],
-    materialLighting: {
-      materials: ["가상 라이팅 셰이더 리플렉트 스킨", "네온 글로우 와이어 프레임 구조", "초현실주의 플로팅 미러 월"],
-      lighting: ["실시간 다이내믹 글로벌 일루미네이션 (GI)", "네온 블루 엠비언트 볼륨 라이팅"],
-      description: "물리적인 실현은 불가능하지만 시각적으로 환상적인 볼륨 라이트와 발광 텍스처를 적용하여 관람자로 하여금 순수한 차원의 '공간 아카이브'에 흡수되는 몰입감을 보증합니다."
-    },
-    renderingUrl: "vr_experience_rendering",
-    finalImageUrl: "vr_experience_final",
-    images: [
-      "https://images.unsplash.com/photo-1507679799987-c73779587ccf?auto=format&fit=crop&w=1200&q=80",
-      "https://images.unsplash.com/photo-1544816155-12df9643f363?auto=format&fit=crop&w=1200&q=80",
-      "https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?auto=format&fit=crop&w=1200&q=80"
-    ]
+    title: "01_Exterior Rendering",
+    subtitle: "Architectural Pavilion Facade Render",
+    role: "3D Rendering Lead",
+    tools: ["SketchUp", "Enscape", "Photoshop"],
+    concept: "금속 루버 파사드 뒤에서 배어 나오는 야간 간접 조명과 건축물 실루엣의 우아함 렌더링.",
+    process: ["Poly Modeling", "Enscape HDRI Lighting Setup"],
+    drawings: [{ title: "Camera Target Plan", description: "원근 왜곡을 수정한 2점 투시 정면 렌더링 카메라 뷰 도면", svgType: "exhibition-floor" }],
+    userFlow: [{ step: "Facade", title: "Main Exterior Approach", description: "원거리에서 빌딩을 맞닥뜨렸을 때의 시각적 볼륨감 시연" }],
+    materialLighting: { materials: ["Anodized Silver Louvers", "Concrete Pillar"], lighting: ["3000K External Uplighters"], description: "하향 기둥 전용 외부 건축 조명과 스카이 HDRI" },
+    renderingUrl: "vis_01_rendering",
+    finalImageUrl: "vis_01_final",
+    images: []
   },
   {
-    id: "bg-01",
+    id: "vis-02",
+    categoryId: "05",
+    title: "02_Interior Rendering",
+    subtitle: "Lobby & Immersive Art Zone Rendering",
+    role: "Interior Visualizer",
+    tools: ["SketchUp", "Enscape", "Photoshop"],
+    concept: "거울과 유리벽에 무한 반사되는 미디어 스크린 공간의 입체감 및 몽환적인 스케일 렌더링.",
+    process: ["Refraction Mapping", "IES Photometric Lights Adjustments"],
+    drawings: [{ title: "Interior Camera Angles Map", description: "로비 전체 개방감을 나타낼 수 있는 광각 투시 뷰 계획", svgType: "minimal-lounge" }],
+    userFlow: [{ step: "Enter", title: "Grand Atrium Vista", description: "중앙 보이드로 유입된 빛이 전 실을 고르게 밝히는 연출" }],
+    materialLighting: { materials: ["Mirror Wall", "Epoxy Clear Coat"], lighting: ["10000K Media Glow", "Spotlights"], description: "미디어 아트의 차가운 파란색 글로우와 베이스 노란 스팟의 대비" },
+    renderingUrl: "vis_02_rendering",
+    finalImageUrl: "vis_02_final",
+    images: []
+  },
+  {
+    id: "vis-03",
+    categoryId: "05",
+    title: "03_Detail Rendering",
+    subtitle: "Material Close-up & Joint Detailing Visual",
+    role: "Material Specialist",
+    tools: ["SketchUp", "Enscape", "Illustrator"],
+    concept: "가구 조인트 부 철제 프레임과 목재의 정밀 결합 디테일을 고해상도로 포커싱한 렌더링.",
+    process: ["High-poly joint molding", "Bump Mapping Adjustments"],
+    drawings: [{ title: "Joinery Detail Axonometric", description: "3D 상세 결합 구조를 표현한 엑소노메트릭 도면", svgType: "detail-section" }],
+    userFlow: [{ step: "Examine", title: "Micro View", description: "마감 선의 우수한 마감 퀄리티를 시각적으로 실감" }],
+    materialLighting: { materials: ["Gunmetal steel bolt", "Matte Birch veneer"], lighting: ["Soft Box Studio Light"], description: "소재 정밀 촬영 스튜디오 기법을 가미한 부드러운 하이라이트 라이팅" },
+    renderingUrl: "vis_03_rendering",
+    finalImageUrl: "vis_03_final",
+    images: []
+  },
+  {
+    id: "vis-04",
+    categoryId: "05",
+    title: "04_Night View",
+    subtitle: "Dusk to Dark Atmosphere Rendering",
+    role: "Visual Artist",
+    tools: ["SketchUp", "Enscape", "Photoshop"],
+    concept: "해 질 무렵 하늘과 내부 웜 화이트 인테리어가 부딪치는 극적인 매직 아워 시각화 연출.",
+    process: ["Atmospheric Fog Design", "Warm Emissive Setup"],
+    drawings: [{ title: "Night View Camera Layout", description: "가로등 및 반사 바닥 효과 극대화를 위한 하향 시각 플랜", svgType: "exhibition-floor" }],
+    userFlow: [{ step: "Dusk", title: "Warm Inside/Cool Outside", description: "내부 온화한 조명이 외부의 파란 노을과 완벽 매치" }],
+    materialLighting: { materials: ["Semi-frosted Acrylic", "Water Feature"], lighting: ["Sunset HDRI", "3000K Linear LEDs"], description: "건축 표면 반사광과 연못 바닥 가변 스팟 쉐이더 융합" },
+    renderingUrl: "vis_04_rendering",
+    finalImageUrl: "vis_04_final",
+    images: []
+  },
+  {
+    id: "vis-05",
+    categoryId: "05",
+    title: "05_Animation Scene",
+    subtitle: "Walkthrough Video Keyframe Set",
+    role: "Motion Director",
+    tools: ["Enscape Video Creator", "Premiere Pro"],
+    concept: "관람자 눈높이 동선을 따라 부드럽게 흘러가는 고사양 시뮬레이션 애니메이션 씬 구성.",
+    process: ["Video Path Keyframing", "Transition Storyboarding"],
+    drawings: [{ title: "Camera Path Trajectory Plan", description: "카메라 워크 속도 및 시야 각을 제어하는 평면 경로 도면", svgType: "vr-gallery" }],
+    userFlow: [{ step: "Glide", title: "Cinematic walkthrough", description: "눈부신 전시장 입구에서 웅장한 메인 아트 홀로의 씬 전이" }],
+    materialLighting: { materials: ["Dynamic Shader Skins"], lighting: ["Real-time Light Swapping Simulation"], description: "이동 경로에 맞춰서 반응하며 켜지는 지능형 레일 센서 등" },
+    renderingUrl: "vis_05_rendering",
+    finalImageUrl: "vis_05_final",
+    images: []
+  },
+
+  // 06_DESIGN_PROCESS
+  {
+    id: "proc-01",
     categoryId: "06",
-    title: "KNOT MUSEUM: Wayfinding System",
-    subtitle: "전시관 콘셉트를 시각적 선과 동선으로 통합 연계한 공간 브랜딩 디자인",
-    role: "Brand Identity Designer & Exhibition Graphic Specialist",
-    tools: ["Illustrator", "Photoshop", "SketchUp"],
-    concept: "역사와 미래, 사람과 예술을 '잇다(Knot)'라는 슬로건 하에 실 매듭의 유기적 매커니즘을 공간 기둥의 그래픽 패널 및 도네이션 월, 그리고 비상 탈출 로 유도 라인에 고스란히 담아 통일성 있는 브랜드 경험(BX)을 추구합니다.",
-    process: [
-      "Logo to Space expansion: 로고 서체의 가로획 비율을 벽면 걸레받이 마감 몰딩 비례와 일치시킴",
-      "Materialization: 아크릴 레이저 컷아웃 및 음각 에칭, 가벽 시트지(Graphics vinyl) 도포 설계",
-      "Color Spec: 신뢰감을 주는 시그널 실버 그레이와 코발트 블루를 메인 그래픽 톤으로 지정"
-    ],
-    drawings: [
-      {
-        title: "웨이파인딩 사인 위치 및 스케일 평면도 (Signage Map & Scale Plan)",
-        description: "사인 위치가 지상 1.5m 지점과 입구 부근에 가변 배치된 디렉토리 플랜 뷰.",
-        svgType: "exhibition-floor"
-      }
-    ],
-    userFlow: [
-      { step: "Entrance", title: "Giant Ribbon Installation (웰컴 그래픽)", description: "천장과 바닥을 나선형으로 연결하는 매듭 형태의 구조물이 메인 입구에서 관람 동선의 물꼬를 트고 시선을 뒤흔듭니다." },
-      { step: "Exhibits", title: "Modular Typography Rails (작품 명판)", description: "벽체의 두께와 일체화된 레일을 달아, 전시 성격이 바뀔 때마다 명판 그래픽 스킨을 가볍게 밀어서 슬라이드 교체하도록 개발했습니다." }
-    ],
-    materialLighting: {
-      materials: ["양크 가공 수지 아크릴", "백색 분체 도장 스틸 프레임", "친환경 실크스크린 그래픽 인쇄"],
-      lighting: ["고해상도 실리콘 플렉시블 LED (사인 전용)", "스포트라이트 백라이팅"],
-      description: "사인 내부의 그림자를 없애고 타이포그래피의 가독성을 극대화하기 위해 초슬림 백라이트 LED 모듈을 내부 격자 배열하여 완벽한 면발광을 실현했습니다."
-    },
-    renderingUrl: "branding_graphic_rendering",
-    finalImageUrl: "branding_graphic_final",
-    images: [
-      "https://images.unsplash.com/photo-1513694203232-719a280e022f?auto=format&fit=crop&w=1200&q=80",
-      "https://images.unsplash.com/photo-1449034446853-66c86144b0ad?auto=format&fit=crop&w=1200&q=80",
-      "https://images.unsplash.com/photo-1541701494587-cb58502866ab?auto=format&fit=crop&w=1200&q=80"
-    ]
+    title: "01_Sketch",
+    subtitle: "Initial Ideation & Spatial Brainstorming",
+    role: "Concept Sketch Artist",
+    tools: ["iPad Procreate", "Pencil Drawing"],
+    concept: "스마트 팜 루버의 기하학적 형태 연구와 수직 중첩 보이드 아이디어를 담은 손스케치 아카이브.",
+    process: ["Freestyle Draft", "Form Evolution Study"],
+    drawings: [{ title: "Hand-drawn Vignette Map", description: "투시 뷰 위 공간 컨셉 마킹 및 수동 스케치", svgType: "detail-section" }],
+    userFlow: [{ step: "Brainstorm", title: "Raw Idea Seed", description: "형상 제한 없이 자유로운 볼륨 도출 단계" }],
+    materialLighting: { materials: ["Carbon Lead", "Warm Tone Paper"], lighting: ["Desk Ambient Light"], description: "수정 가능한 상태의 드래프팅 무드" },
+    renderingUrl: "proc_01_rendering",
+    finalImageUrl: "proc_01_final",
+    images: []
   },
   {
-    id: "pa-01",
+    id: "proc-02",
+    categoryId: "06",
+    title: "02_Massing",
+    subtitle: "Volumetric Form Subtraction Study",
+    role: "Mass Modeler",
+    tools: ["SketchUp", "Physical Foam Board Model"],
+    concept: "하나의 거대한 매스에서 사선과 비움(Void)을 깎아나가는 감산적 형태 연구 프로세스.",
+    process: ["Mass Subtraction", "Proportion Fine-tuning"],
+    drawings: [{ title: "Mass Evolutionary Stages", description: "단순 큐브에서 복잡한 기하학 매스로 가는 전개 과정도", svgType: "exhibition-floor" }],
+    userFlow: [{ step: "Carve", title: "Subtraction Progress", description: "보이드 공간이 서서히 구조적으로 성립하는 과정 입증" }],
+    materialLighting: { materials: ["Foam core Board", "Matt Acrylic block"], lighting: ["Directional Hard Spot"], description: "매스의 입체감을 확인하기 위한 강력한 주백색 투광기" },
+    renderingUrl: "proc_02_rendering",
+    finalImageUrl: "proc_02_final",
+    images: []
+  },
+  {
+    id: "proc-03",
+    categoryId: "06",
+    title: "03_Modeling",
+    subtitle: "High-precision Parametric & Structure Clean-up",
+    role: "SketchUp Modeler",
+    tools: ["SketchUp Pro", "Curviloft Extension"],
+    concept: "벽체 조인트 및 가구 치수가 0.5mm 오차도 없도록 정리된 고밀도 컴포넌트 모델 구축 과정.",
+    process: ["Componentizing", "Purging Outliner Structure"],
+    drawings: [{ title: "X-Ray Structural Model View", description: "3D 모델의 뼈대와 레이어 명칭 통합 점검 도면", svgType: "detail-section" }],
+    userFlow: [{ step: "Structure", title: "Clean Mesh Check", description: "렌더링 시 노이즈 및 면 뒤집힘을 방지하기 위한 최적 페이스화" }],
+    materialLighting: { materials: ["Clean Clay Default Shader"], lighting: ["Pure Daylight Overhead"], description: "형태 구조 자체의 완성도 집중을 위한 클레이 조명 연출" },
+    renderingUrl: "proc_03_rendering",
+    finalImageUrl: "proc_03_final",
+    images: []
+  },
+  {
+    id: "proc-04",
+    categoryId: "06",
+    title: "04_Material Test",
+    subtitle: "Tactile Material Coordination and Specs",
+    role: "Material Curator",
+    tools: ["Physical Samples", "Enscape Material Editor"],
+    concept: "금속, 목재, 미러 아크릴, 유리 등 실제 기획안에 사용될 실물 마감재 선별 매칭 프로세스.",
+    process: ["Glossiness Test", "Texture Map Calibration"],
+    drawings: [{ title: "Material Board Mapping Schema", description: "공간 위치별 가구 마감 코드 및 자재 매트릭스 도면", svgType: "minimal-lounge" }],
+    userFlow: [{ step: "Select", title: "Sensory Balance", description: "차가운 하이테크 소재와 따뜻한 오가닉 목재의 비율 3:7 조율" }],
+    materialLighting: { materials: ["Brushed Titanium", "Recycled Cork"], lighting: ["Dual Spot Color Test"], description: "웜라이트와 쿨라이트 각각에서 색 변화 확인 시뮬레이션" },
+    renderingUrl: "proc_04_rendering",
+    finalImageUrl: "proc_04_final",
+    images: []
+  },
+  {
+    id: "proc-05",
+    categoryId: "06",
+    title: "05_Render Test",
+    subtitle: "Draft View Light Probe & Exposure Adjustments",
+    role: "Rendering Specialist",
+    tools: ["Enscape Draft Mode"],
+    concept: "정밀 렌더 전 구도별 반사 세기, 그림자 길이, 광원 연색성을 확인하기 위한 테스트 렌더링 세트.",
+    process: ["Exposure Value Tuning", "Depth of Field Settings"],
+    drawings: [{ title: "Lux Analysis Overlay", description: "공간 전체 조도(Lux) 흐름 및 과노출(Burn-out) 자가 경고 지도", svgType: "vr-gallery" }],
+    userFlow: [{ step: "Verify", title: "Optimal Lux Check", description: "체류 구역은 150Lux, 전시 포인트는 500Lux 적정선 유지 입증" }],
+    materialLighting: { materials: ["Grey Neutral Lambert Paint"], lighting: ["IES Spotlight Array Setup"], description: "오로지 빛의 입체적인 전파만 보기 위한 무채색 그레이 렌더" },
+    renderingUrl: "proc_05_rendering",
+    finalImageUrl: "proc_05_final",
+    images: []
+  },
+  {
+    id: "proc-06",
+    categoryId: "06",
+    title: "06_Post Production",
+    subtitle: "Photoshop Matte Painting & Retouching Pack",
+    role: "Creative Retoucher",
+    tools: ["Photoshop", "Lightroom Mobile"],
+    concept: "렌더 결과물에 스케일 피플 배치, 배경 하늘 교체, 대비 증진을 통해 회화 같은 예술적 가치를 불어넣는 최종 보정.",
+    process: ["Scale People Overlaying", "Color Grading with LUTs"],
+    drawings: [{ title: "Composite Layer Hierarchy Map", description: "조명 채널(Emissive), 반사 채널 분리 합성 레이어 설계도", svgType: "retail-layout" }],
+    userFlow: [{ step: "Polishing", title: "Final Graphic Touch", description: "완성본에 필름 그레인을 추가하여 세련되고 깊이 있는 아카이브적 무드 완성" }],
+    materialLighting: { materials: ["High-resolution PNG Assets"], lighting: ["Contrast Enhancement Curve Mapping"], description: "명암비의 미세 조율과 비네팅 가미로 깊은 몰입도 유도" },
+    renderingUrl: "proc_06_rendering",
+    finalImageUrl: "proc_06_final",
+    images: []
+  },
+
+  // 07_COMPETITION_WORKS
+  {
+    id: "comp-01",
     categoryId: "07",
-    title: "CONCRETE TO LIGHT: Design Ideation & Process",
-    subtitle: "디자이너로서 깊은 사고방식과 기획의 변천 과정을 투명하게 공개하는 아카이브",
-    role: "Visual Archivist & Content Curator",
-    tools: ["SketchUp", "Photoshop", "Hand Sketch", "AutoCAD"],
-    concept: "완성된 시각 결과물 뒤에 숨어 있는 치열한 고민, 스케치, 실패했던 대안(Alternative concepts) 분석 및 매스 스터디 과정을 모아 가치 있는 '과정 중심' 전시를 제안합니다.",
-    process: [
-      "Ideation: 손스케치와 마인드맵을 이용해 공간이 주는 원초적 감정 시각화",
-      "Mass Study: 우드락과 폼포드를 자르고 붙이며 최적의 조형 비례 발견",
-      "Iteration: Enscape 라이트 시뮬레이션의 미세 조정을 통한 완벽한 빛의 도달 범위 도출"
-    ],
-    drawings: [
-      {
-        title: "초기 매스 및 가구 배치 스케치 아카이브 (Initial Sketch Set)",
-        description: "머릿속의 파비뇽 콘셉트를 거칠게 그려낸 다이어그램과, 기류 및 음향 반사 경로를 실시간 필기한 초기 노트 레이아웃 모음입니다.",
-        svgType: "minimal-lounge"
-      }
-    ],
-    userFlow: [
-      { step: "Phase 1", title: "Pen Drawing & Concept Note", description: "디자이너의 최초 영감 노트를 스캔하여, 생각의 흐름과 공간 스토리를 선명하게 전달합니다." },
-      { step: "Phase 2", title: "Volumetric Clay Model Study", description: "컴퓨터 속 설계 이전, 매스의 덩어리감과 볼륨을 육안으로 관찰하기 위해 점토 및 우드락으로 스터디한 궤적입니다." }
-    ],
-    materialLighting: {
-      materials: ["트레이싱지 크로키 아카이브", "크라프트지 무광 보드", "황동 클립 핀 유닛"],
-      lighting: ["웜 오렌지 에디슨 펜던트 벌브 (2500K)", "아이디어 스포트 라이팅 테이프"],
-      description: "차갑고 전문적인 메인 워크스테이션 분위기 속에 자연의 온기를 불어넣는 러프한 아이디어 도록 형식을 아카이브 패널로 기획하여 풍성한 디테일을 가미합니다."
-    },
-    renderingUrl: "process_archive_rendering",
-    finalImageUrl: "process_archive_final",
-    images: [
-      "https://images.unsplash.com/photo-1503387762-592deb58ef4e?auto=format&fit=crop&w=1200&q=80",
-      "https://images.unsplash.com/photo-1516962215378-7fa2e137ae93?auto=format&fit=crop&w=1200&q=80",
-      "https://images.unsplash.com/photo-1541829017064-778a67797c42?auto=format&fit=crop&w=1200&q=80"
-    ]
+    title: "01_ATLAS-1",
+    subtitle: "Sustainable Smart Food Center Proposal",
+    role: "Spatial Concept Designer",
+    tools: ["SketchUp Pro", "AutoCAD", "Indesign"],
+    concept: "버려진 도심 속 폐창고를 현대인들을 위한 식물 정원과 푸드 허브 공간으로 대개조하는 우수 제안작.",
+    process: ["Regenerative Architecture", "Adaptive Reuse Planning"],
+    drawings: [{ title: "Adaptive Renovation Section", description: "기존 철골 뼈대에 신규 복층 유닛 결합 공법 도면", svgType: "exhibition-floor" }],
+    userFlow: [{ step: "Transform", title: "New Green Core", description: "오래된 인더스트리얼 거친 스킨 내부를 채우는 하이테크 농업 타워" }],
+    materialLighting: { materials: ["Weathered Brick", "Anodized Green Aluminium"], lighting: ["Warm Spotlights combined with Grow LED"], description: "도시 재생 흔적을 보존하는 극적 연출 라이팅" },
+    renderingUrl: "comp_01_rendering",
+    finalImageUrl: "comp_01_final",
+    images: []
+  },
+  {
+    id: "comp-02",
+    categoryId: "07",
+    title: "02_Panel Design",
+    subtitle: "High-density Presentation Layout Composition",
+    role: "Layout & Editorial Artist",
+    tools: ["Indesign", "Illustrator"],
+    concept: "도면 정보와 렌더 이미지를 극적으로 배열하는 타이포그래피 격자 설계 및 가독성 높은 패널 레이아웃.",
+    process: ["Grid Calibration", "Readability Analysis"],
+    drawings: [{ title: "Panel Composition Map", description: "A0 패널의 도판 번호 배치 순서 및 폰트 크기 비례 도면", svgType: "retail-layout" }],
+    userFlow: [{ step: "Read", title: "Information Flow", description: "좌상단 핵심 컨셉부터 우하단 디테일 렌더로 매끄럽게 떨어지는 시선 유도" }],
+    materialLighting: { materials: ["High-gloss premium paper"], lighting: ["CRI 98 Panel Check Spot"], description: "오프라인 출력 시 잉크 번짐 및 대비 왜곡이 없는 정밀 컬러 세팅" },
+    renderingUrl: "comp_02_rendering",
+    finalImageUrl: "comp_02_final",
+    images: []
+  },
+  {
+    id: "comp-03",
+    categoryId: "07",
+    title: "03_Presentation",
+    subtitle: "Pitch Deck & Exhibition Board Narrative",
+    role: "Presenter & Concept Speaker",
+    tools: ["Keynote", "Illustrator"],
+    concept: "설계안의 사회적 가치, 경제적 이점, 차별화된 디자인 철학을 효과적으로 설득하는 프레젠테이션 덱 설계.",
+    process: ["Narrative Arc Design", "Client-specific Speech Deck"],
+    drawings: [{ title: "Presentation Screen Ratio Map", description: "전면 와이드 빔 프로젝션 해상도 매칭 도면", svgType: "minimal-lounge" }],
+    userFlow: [{ step: "Pitch", title: "Emotional Hooking", description: "공간의 물리적 디테일보다 인간이 누릴 경험의 가치 중심 스토리텔링" }],
+    materialLighting: { materials: ["Matte Soft-touch Slide Deck"], lighting: ["Dimmed Lecture Hall Scene Setting"], description: "화면 명암과 실내 조도의 밸런스를 고려한 슬라이드 컬러 팔레트" },
+    renderingUrl: "comp_03_rendering",
+    finalImageUrl: "comp_03_final",
+    images: []
+  },
+
+  // 08_AI_WORKFLOW
+  {
+    id: "aiwf-01",
+    categoryId: "08",
+    title: "01_AI Concept",
+    subtitle: "AI-assisted Spatial Ideation & Concept Generation",
+    role: "AI Workflow Specialist",
+    tools: ["Gemini 2.5 Flash", "ChatGPT"],
+    concept: "인공지능 대형 언어 모델을 활용해 공간 철학적 키워드와 인문학적 스토리를 고정밀로 추출하는 개념 구체화 워크플로우.",
+    process: ["AI Prompting", "Keyword Clustering", "Story Arc Expansion"],
+    drawings: [{ title: "Prompt Logic Matrix Diagram", description: "프롬프트 입력 구조와 연계 키워드의 분화 흐름 다이어그램", svgType: "detail-section" }],
+    userFlow: [{ step: "Prompt", title: "Cognitive Expansion", description: "스마트 팜과 인문학적 치유 키워드의 융합 프롬프트 작성" }],
+    materialLighting: { materials: ["Digital Text Node Chart"], lighting: ["Pure Screen Backlight"], description: "시각 자극을 줄인 미니멀 텍스트 디스플레이" },
+    renderingUrl: "aiwf_01_rendering",
+    finalImageUrl: "aiwf_01_final",
+    images: []
+  },
+  {
+    id: "aiwf-02",
+    categoryId: "08",
+    title: "02_Image Generation",
+    subtitle: "Midjourney/Gemini Text-to-Image Generation Work",
+    role: "Visual Concept Generator",
+    tools: ["Midjourney v6", "DALL-E 3"],
+    concept: "공간 시각화 프롬프트를 정교하게 튜닝하여, 3D 모델링 착수 전 초현실적 디자인 아이디어를 빠르게 수십 장 생성 및 매치해보는 단계.",
+    process: ["Text-to-Image Generation", "Variation Test", "Upscaling Production"],
+    drawings: [{ title: "AI Generated Camera Angles Plan", description: "AI가 생성한 대표 뷰의 왜곡도 및 실내외 투시 뷰 매치 맵", svgType: "vr-gallery" }],
+    userFlow: [{ step: "Select", title: "Curated Moodboard", description: "생성 이미지 500개 중 회사의 톤앤매너와 어울리는 5개 핵심 무드 선별" }],
+    materialLighting: { materials: ["Base64 Digital Images"], lighting: ["Volumetric God Rays Rendering"], description: "자연 빛의 미세 입자가 대기 중에 퍼지는 듯한 웅장하고 예술적인 광원 제안" },
+    renderingUrl: "aiwf_02_rendering",
+    finalImageUrl: "aiwf_02_final",
+    images: []
+  },
+  {
+    id: "aiwf-03",
+    categoryId: "08",
+    title: "03_Prompt Workflow",
+    subtitle: "Structured Spatial Engineering Prompting",
+    role: "Creative Technologist",
+    tools: ["Google AI Studio", "System Instructions Preset"],
+    concept: "재질, 카메라 초점 거리(f-stop), 조명 조건(HDRI), 아티스트 기법을 가미한 특화 프롬프트 템플릿 아카이브 구축.",
+    process: ["Prompt Structuring", "Negative Prompt Tuning"],
+    drawings: [{ title: "Prompt Structural Flowchart", description: "입력값(인풋) 변경에 따라 공간 무드를 즉시 조정하는 프롬프트 조율 플로우", svgType: "retail-layout" }],
+    userFlow: [{ step: "Run", title: "Batch Generation", description: "구도 일치 하에 시간대별 스카이 박스만 교체하는 고속 생성 사이클" }],
+    materialLighting: { materials: ["Text String Variables"], lighting: ["Global Illumination Parameterizing"], description: "인물 피부, 가죽 텍스처, 금속 반사에 따른 가변 광량 프롬프트 설정" },
+    renderingUrl: "aiwf_03_rendering",
+    finalImageUrl: "aiwf_03_final",
+    images: []
+  },
+  {
+    id: "aiwf-04",
+    categoryId: "08",
+    title: "04_Final Output",
+    subtitle: "Hybrid AI and CAD/3D Combined Architecture Portfolio",
+    role: "Hybrid Spatial Designer",
+    tools: ["Stable Diffusion ControlNet", "SketchUp Pro", "Photoshop"],
+    concept: "직접 설계한 스케치업 3D 화이트 모델 구조를 AI 이미지 디퓨전에 투영(ControlNet)하여, 실사 촬영본 수준의 퀄리티로 대리석/메탈 마감을 리터칭하는 하이브리드 워크플로우 완성.",
+    process: ["ControlNet Depth Map Extract", "High-poly 3D Hybrid Render"],
+    drawings: [{ title: "Hybrid Workflow Architecture Map", description: "3D CAD 정밀 모델과 AI 쉐이딩 리터치 기법의 융합 흐름 도면", svgType: "exhibition-floor" }],
+    userFlow: [{ step: "Fuse", title: "Synthesized masterpiece", description: "시공 검증을 마친 정밀 CAD 레이아웃 위에 얹힌 압도적인 실사적 질감 연출" }],
+    materialLighting: { materials: ["ControlNet Material Masks"], lighting: ["Fully Calibrated Hybrid Refracted Lights"], description: "인공지능과 실제 설계 배광이 한 데 어우러진 완벽한 연색성 도출" },
+    renderingUrl: "aiwf_04_rendering",
+    finalImageUrl: "aiwf_04_final",
+    images: []
   }
 ];

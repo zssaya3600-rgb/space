@@ -23,34 +23,178 @@ import {
   Code,
   Sliders,
   Settings,
+  Upload,
   HelpCircle,
   FileCode,
   Workflow,
   Sparkles,
   ChevronRight,
   ChevronLeft,
-  Eye
+  Eye,
+  GraduationCap
 } from "lucide-react";
 import { defaultCategories, defaultProjects } from "./data";
 import { Category, Project } from "./types";
-import CADDrawings from "./components/CADDrawings";
-import CADViewport from "./components/CADViewport";
+
+
+function renderCategoryThumbnail(catId: string) {
+  switch (catId) {
+    case "01": // ATLAS-1 Featured
+      return (
+        <svg viewBox="0 0 100 60" className="w-full h-full stroke-sky-400/40 fill-none stroke-[0.75] transition-all duration-300">
+          <circle cx="50" cy="30" r="22" className="stroke-sky-500/15" />
+          <circle cx="50" cy="30" r="14" className="stroke-sky-500/25 stroke-dashed" />
+          <circle cx="50" cy="30" r="6" className="stroke-sky-400/40" />
+          <line x1="15" y1="30" x2="85" y2="30" className="stroke-sky-500/5 stroke-dashed" />
+          <line x1="50" y1="5" x2="50" y2="55" className="stroke-sky-500/5 stroke-dashed" />
+          <path d="M 30,30 L 50,5 L 70,30 L 50,55 Z" className="stroke-sky-400/20" />
+          <circle cx="50" cy="5" r="1.5" className="fill-sky-400 stroke-none" />
+          <circle cx="30" cy="30" r="1.5" className="fill-sky-400/60 stroke-none" />
+          <circle cx="70" cy="30" r="1.5" className="fill-sky-400/60 stroke-none" />
+          <text x="8" y="10" className="fill-sky-500/50 font-mono text-[4px] stroke-none tracking-wider">LAT: 37.33°</text>
+          <text x="68" y="52" className="fill-sky-500/50 font-mono text-[4px] stroke-none tracking-wider">PORTAL_01</text>
+        </svg>
+      );
+    case "02": // Exhibition Design
+      return (
+        <svg viewBox="0 0 100 60" className="w-full h-full stroke-sky-400/30 fill-none stroke-[0.6]">
+          <path d="M 50,12 L 85,30 L 50,48 L 15,30 Z" className="stroke-zinc-800" />
+          <path d="M 50,12 L 50,48" className="stroke-zinc-850" />
+          <path d="M 15,30 L 85,30" className="stroke-zinc-850" />
+          <path d="M 32,21 L 32,39 L 50,48" className="stroke-sky-500/40" />
+          <path d="M 68,21 L 68,39 L 50,48" className="stroke-sky-500/40" />
+          <line x1="32" y1="21" x2="50" y2="12" className="stroke-sky-500/30 stroke-dashed" />
+          <line x1="68" y1="21" x2="50" y2="12" className="stroke-sky-500/30 stroke-dashed" />
+          <path d="M 50,34 L 58,38 L 50,42 L 42,38 Z" className="stroke-sky-400/30 fill-sky-950/10" />
+          <line x1="50" y1="42" x2="50" y2="48" className="stroke-sky-400/30" />
+          <text x="8" y="10" className="fill-zinc-600 font-mono text-[4px] stroke-none tracking-wider">GRID: BOOTH</text>
+        </svg>
+      );
+    case "03": // Interior Design
+      return (
+        <svg viewBox="0 0 100 60" className="w-full h-full stroke-sky-400/30 fill-none stroke-[0.6]">
+          <path d="M 15,10 H 85 V 50 H 15 Z" className="stroke-zinc-800" />
+          <path d="M 15,32 H 55 V 50" className="stroke-sky-500/30" />
+          <path d="M 55,38 A 12,12 0 0,1 67,50" className="stroke-sky-400/30 stroke-dashed" />
+          <line x1="55" y1="50" x2="55" y2="38" className="stroke-sky-400/30" />
+          <rect x="22" y="16" width="18" height="10" className="stroke-sky-500/15 fill-zinc-950/20" />
+          <circle cx="31" cy="21" r="2.5" className="stroke-sky-400/15" />
+          <rect x="68" y="16" width="10" height="24" className="stroke-sky-500/10" />
+          <text x="8" y="10" className="fill-zinc-600 font-mono text-[4px] stroke-none tracking-wider">PLAN_L-02</text>
+        </svg>
+      );
+    case "04": // 3D Visualization
+      return (
+        <svg viewBox="0 0 100 60" className="w-full h-full stroke-sky-400/30 fill-none stroke-[0.6]">
+          <polygon points="50,10 75,25 65,48 35,48 25,25" className="stroke-sky-500/15" />
+          <polygon points="50,10 50,32 75,25" className="stroke-sky-500/30" />
+          <polygon points="50,32 65,48 50,52" className="stroke-sky-400/30" />
+          <polygon points="25,25 50,32 35,48" className="stroke-sky-500/20" />
+          <ellipse cx="50" cy="30" rx="38" ry="12" className="stroke-zinc-800 stroke-dashed" />
+          <circle cx="50" cy="32" r="1.5" className="fill-sky-400 stroke-none" />
+          <text x="8" y="10" className="fill-zinc-600 font-mono text-[4px] stroke-none tracking-wider">MESH_3D</text>
+        </svg>
+      );
+    case "05": // Research Archive
+      return (
+        <svg viewBox="0 0 100 60" className="w-full h-full stroke-sky-400/30 fill-none stroke-[0.6]">
+          <circle cx="35" cy="25" r="11" className="stroke-sky-400/20 fill-sky-950/5" />
+          <circle cx="65" cy="32" r="9" className="stroke-sky-400/15 fill-sky-950/5" />
+          <circle cx="50" cy="42" r="7" className="stroke-sky-400/10 fill-sky-950/5" />
+          <path d="M 45,22 Q 50,25 55,28" className="stroke-sky-400/30" />
+          <path d="M 59,38 Q 50,40 44,34" className="stroke-sky-400/20 stroke-dashed" />
+          <line x1="15" y1="12" x2="85" y2="48" className="stroke-zinc-850" />
+          <line x1="85" y1="12" x2="15" y2="48" className="stroke-zinc-850" />
+          <text x="8" y="10" className="fill-zinc-600 font-mono text-[4px] stroke-none tracking-wider">ANLY_ZONE</text>
+        </svg>
+      );
+    case "06": // Branding & Graphic
+      return (
+        <svg viewBox="0 0 100 60" className="w-full h-full stroke-sky-400/30 fill-none stroke-[0.6]">
+          <rect x="25" y="10" width="50" height="40" className="stroke-zinc-800 stroke-dashed" />
+          <line x1="50" y1="10" x2="50" y2="50" className="stroke-zinc-850" />
+          <line x1="25" y1="30" x2="75" y2="30" className="stroke-zinc-850" />
+          <circle cx="50" cy="30" r="16" className="stroke-sky-400/25" />
+          <circle cx="42" cy="30" r="8" className="stroke-sky-400/15" />
+          <text x="8" y="10" className="fill-zinc-600 font-mono text-[4px] stroke-none tracking-wider">GRAPHIC_1.618</text>
+        </svg>
+      );
+    case "07": // Design Process
+      return (
+        <svg viewBox="0 0 100 60" className="w-full h-full stroke-sky-400/30 fill-none stroke-[0.6]">
+          <path d="M 20,45 L 35,25 H 65 L 80,45 Z" className="stroke-sky-500/25 fill-sky-950/5" />
+          <line x1="10" y1="45" x2="90" y2="45" className="stroke-sky-400/30" />
+          <line x1="35" y1="18" x2="65" y2="18" className="stroke-sky-400/15" />
+          <line x1="35" y1="16" x2="35" y2="20" className="stroke-sky-400/15" />
+          <line x1="65" y1="16" x2="65" y2="20" className="stroke-sky-400/15" />
+          <line x1="75" y1="25" x2="75" y2="45" className="stroke-sky-400/15 stroke-dashed" />
+          <text x="76" y="34" className="fill-zinc-600 font-mono text-[3.5px] stroke-none">H: 3.2M</text>
+          <text x="8" y="10" className="fill-zinc-600 font-mono text-[4px] stroke-none tracking-wider">ELEV_B-B'</text>
+        </svg>
+      );
+    case "08": // AI Workflow
+    default:
+      return (
+        <svg viewBox="0 0 100 60" className="w-full h-full stroke-sky-400/30 fill-none stroke-[0.6]">
+          <circle cx="30" cy="30" r="4" className="stroke-sky-500 fill-sky-950/40" />
+          <circle cx="50" cy="18" r="4" className="stroke-sky-500 fill-sky-950/40" />
+          <circle cx="50" cy="42" r="4" className="stroke-sky-500 fill-sky-950/40" />
+          <circle cx="70" cy="30" r="4" className="stroke-sky-500 fill-sky-950/40" />
+          <line x1="34" y1="30" x2="46" y2="18" className="stroke-sky-400/40" />
+          <line x1="34" y1="30" x2="46" y2="42" className="stroke-sky-400/40" />
+          <line x1="54" y1="18" x2="66" y2="30" className="stroke-sky-400/40" />
+          <line x1="54" y1="42" x2="66" y2="30" className="stroke-sky-400/40" />
+          <line x1="34" y1="30" x2="66" y2="30" className="stroke-sky-400/20 stroke-dashed" />
+          <text x="8" y="10" className="fill-zinc-600 font-mono text-[4px] stroke-none tracking-wider">AI_NODE_MATRIX</text>
+        </svg>
+      );
+  }
+}
 
 export default function App() {
   // Application Data States (persisted in localStorage)
   const [categories, setCategories] = useState<Category[]>(() => {
     const saved = localStorage.getItem("workspace_categories");
-    return saved ? JSON.parse(saved) : defaultCategories;
+    if (saved) {
+      const parsed = JSON.parse(saved) as Category[];
+      // Reset if old structure is detected or the new "Exhibition Research" / "AI Workflow" category is missing
+      if (
+        !parsed.some(c => c.title === "Exhibition Research") ||
+        !parsed.some(c => c.title === "AI Workflow") ||
+        parsed.some(c => c.title === "Research & Concept")
+      ) {
+        localStorage.setItem("workspace_categories", JSON.stringify(defaultCategories));
+        return defaultCategories;
+      }
+      return parsed;
+    }
+    return defaultCategories;
   });
   const [projects, setProjects] = useState<Project[]>(() => {
     const saved = localStorage.getItem("workspace_projects");
-    return saved ? JSON.parse(saved) : defaultProjects;
+    if (saved) {
+      const parsed = JSON.parse(saved) as Project[];
+      // Update cache if using old structure or missing the new "aiwf-01" project
+      if (
+        parsed.some(p => p.id === "ex-01" || p.id === "ex-02" || p.id === "in-01") ||
+        !parsed.some(p => p.id === "aiwf-01")
+      ) {
+        localStorage.setItem("workspace_projects", JSON.stringify(defaultProjects));
+        return defaultProjects;
+      }
+      return parsed;
+    }
+    return defaultProjects;
   });
 
   // Selected state
   const [selectedCategory, setSelectedCategory] = useState<Category | null>(null);
   const [selectedProject, setSelectedProject] = useState<Project | null>(null);
   const [searchQuery, setSearchQuery] = useState("");
+  
+  // Custom About/Contact Modal states
+  const [showAboutModal, setShowAboutModal] = useState(false);
+  const [showContactModal, setShowContactModal] = useState(false);
   
   // Real-time states
   const [time, setTime] = useState("");
@@ -82,6 +226,7 @@ export default function App() {
   const [formImages, setFormImages] = useState<string[]>([]);
   const [isDragging, setIsDragging] = useState(false);
   const [activeImageIndex, setActiveImageIndex] = useState(0);
+  const [isDetailDragging, setIsDetailDragging] = useState(false);
 
   // System notification
   const [notification, setNotification] = useState<string | null>(null);
@@ -106,6 +251,54 @@ export default function App() {
   const saveAllData = (updatedCategories: Category[], updatedProjects: Project[]) => {
     localStorage.setItem("workspace_categories", JSON.stringify(updatedCategories));
     localStorage.setItem("workspace_projects", JSON.stringify(updatedProjects));
+  };
+
+  const handleCategoryIconUpload = (catId: string, e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    const validTypes = ["image/jpeg", "image/png", "image/webp", "image/jpg"];
+    if (!validTypes.includes(file.type)) {
+      alert("JPG, PNG, WEBP 형식의 이미지 파일만 업로드할 수 있습니다.");
+      return;
+    }
+
+    const reader = new FileReader();
+    reader.onload = (event) => {
+      const base64Data = event.target?.result as string;
+      if (base64Data) {
+        setCategories(prevCategories => {
+          const updated = prevCategories.map(c => {
+            if (c.id === catId) {
+              return { ...c, image: base64Data };
+            }
+            return c;
+          });
+          saveAllData(updated, projects);
+          return updated;
+        });
+        triggerNotification(`CATEGORY "${catId}" THUMBNAIL UPDATED.`);
+      }
+    };
+    reader.readAsDataURL(file);
+  };
+
+  const handleCategoryIconDelete = (catId: string, e: React.MouseEvent) => {
+    e.stopPropagation();
+    if (!window.confirm("업로드한 이미지를 삭제하시겠습니까?")) return;
+
+    setCategories(prevCategories => {
+      const updated = prevCategories.map(c => {
+        if (c.id === catId) {
+          const { image, ...rest } = c;
+          return rest;
+        }
+        return c;
+      });
+      saveAllData(updated, projects);
+      return updated;
+    });
+    triggerNotification(`CATEGORY "${catId}" THUMBNAIL RESTORED.`);
   };
 
   const triggerNotification = (message: string) => {
@@ -221,7 +414,7 @@ export default function App() {
     setFormLighting(project.materialLighting.lighting.join(", "));
     setFormMatDesc(project.materialLighting.description);
     setFormDrawingType(project.drawings[0]?.svgType || "exhibition-floor");
-    setFormImages(project.images || []);
+    setFormImages((project.images || []).filter(img => img.startsWith("data:") || img.startsWith("blob:")));
     
     const flowText = project.userFlow.map(f => `${f.step}:${f.title}:${f.description}`).join("\n");
     setFormUserFlow(flowText);
@@ -330,6 +523,105 @@ export default function App() {
     setFormImages(prev => prev.filter((_, idx) => idx !== indexToRemove));
   };
 
+  const handleDirectImageUpload = (files: FileList) => {
+    if (!selectedProject) return;
+
+    let processedCount = 0;
+    const targetProject = selectedProject;
+    const filesArray = Array.from(files);
+
+    filesArray.forEach((file) => {
+      if (!file.type.startsWith("image/")) {
+        triggerNotification("ERROR: SELECTED FILE IS NOT AN IMAGE.");
+        return;
+      }
+
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        const img = new Image();
+        img.onload = () => {
+          const MAX_WIDTH = 1200;
+          const MAX_HEIGHT = 1200;
+          let width = img.width;
+          let height = img.height;
+
+          if (width > height) {
+            if (width > MAX_WIDTH) {
+              height *= MAX_WIDTH / width;
+              width = MAX_WIDTH;
+            }
+          } else {
+            if (height > MAX_HEIGHT) {
+              width *= MAX_HEIGHT / height;
+              height = MAX_HEIGHT;
+            }
+          }
+
+          const canvas = document.createElement("canvas");
+          canvas.width = width;
+          canvas.height = height;
+
+          const ctx = canvas.getContext("2d");
+          if (ctx) {
+            ctx.drawImage(img, 0, 0, width, height);
+            const compressedBase64 = canvas.toDataURL("image/jpeg", 0.75);
+            
+            setProjects(prevProjects => {
+              const updated = prevProjects.map(p => {
+                if (p.id === targetProject.id) {
+                  const existingImages = p.images || [];
+                  const newImages = [...existingImages, compressedBase64];
+                  
+                  // Update selectedProject in real-time as well
+                  setSelectedProject(prev => prev && prev.id === targetProject.id ? { ...prev, images: newImages } : prev);
+                  return { ...p, images: newImages };
+                }
+                return p;
+              });
+              saveAllData(categories, updated);
+              return updated;
+            });
+            
+            processedCount++;
+            triggerNotification(`IMAGE "${file.name}" UPLOADED SUCCESSFULLY.`);
+          }
+        };
+        img.src = e.target?.result as string;
+      };
+      reader.readAsDataURL(file);
+    });
+  };
+
+  const handleDirectImageDelete = (indexToDelete: number) => {
+    if (!selectedProject) return;
+    if (!window.confirm("선택한 이미지를 프로젝트에서 삭제하시겠습니까?")) return;
+
+    const targetImageStr = uploadedImages[indexToDelete];
+    if (!targetImageStr) return;
+
+    setProjects(prevProjects => {
+      const updated = prevProjects.map(p => {
+        if (p.id === selectedProject.id) {
+          const existingImages = p.images || [];
+          const newImages = existingImages.filter((img) => img !== targetImageStr);
+          
+          setSelectedProject(prev => prev ? { ...prev, images: newImages } : null);
+          setActiveImageIndex(prev => {
+            const nextUploadedCount = newImages.filter(img => img.startsWith("data:") || img.startsWith("blob:")).length;
+            if (nextUploadedCount === 0) return 0;
+            if (prev >= nextUploadedCount) return nextUploadedCount - 1;
+            return prev;
+          });
+          return { ...p, images: newImages };
+        }
+        return p;
+      });
+      saveAllData(categories, updated);
+      return updated;
+    });
+    triggerNotification("IMAGE REMOVED SUCCESSFULLY.");
+  };
+
   // Delete project
   const handleDeleteProject = (id: string, name: string) => {
     if (window.confirm(`Are you sure you want to delete "${name}" from the CAD Workspace?`)) {
@@ -370,6 +662,72 @@ export default function App() {
       )
     : [];
 
+  // PDF & Navigation helper handlers
+  const handleDownloadPDF = () => {
+    alert("SOYOUNG_KIM_SPACE_DESIGN_PORTFOLIO.pdf 다운로드를 시작합니다.");
+    triggerNotification("PDF DOWNLOAD INITIATED: 24.5 MB");
+  };
+
+  const handleNavClick = (menu: string) => {
+    const lowerMenu = menu.toUpperCase();
+    if (lowerMenu === "WORK") {
+      setSelectedCategory(null);
+      setSelectedProject(null);
+      setTimeout(() => {
+        document.getElementById("finder-window-section")?.scrollIntoView({ behavior: "smooth" });
+      }, 100);
+    } else if (lowerMenu === "PROJECTS") {
+      const cat = categories.find(c => c.id === "01");
+      if (cat) {
+        setSelectedCategory(cat);
+        const catProjs = projects.filter(p => p.categoryId === cat.id);
+        if (catProjs.length > 0) setSelectedProject(catProjs[0]);
+      }
+      setTimeout(() => {
+        document.getElementById("finder-window-section")?.scrollIntoView({ behavior: "smooth" });
+      }, 100);
+    } else if (lowerMenu === "RESEARCH") {
+      const cat = categories.find(c => c.id === "02");
+      if (cat) {
+        setSelectedCategory(cat);
+        const catProjs = projects.filter(p => p.categoryId === cat.id);
+        if (catProjs.length > 0) setSelectedProject(catProjs[0]);
+      }
+      setTimeout(() => {
+        document.getElementById("finder-window-section")?.scrollIntoView({ behavior: "smooth" });
+      }, 100);
+    } else if (lowerMenu === "VISUALIZATION") {
+      const cat = categories.find(c => c.id === "05");
+      if (cat) {
+        setSelectedCategory(cat);
+        const catProjs = projects.filter(p => p.categoryId === cat.id);
+        if (catProjs.length > 0) setSelectedProject(catProjs[0]);
+      }
+      setTimeout(() => {
+        document.getElementById("finder-window-section")?.scrollIntoView({ behavior: "smooth" });
+      }, 100);
+    } else if (lowerMenu === "PROCESS") {
+      const cat = categories.find(c => c.id === "06");
+      if (cat) {
+        setSelectedCategory(cat);
+        const catProjs = projects.filter(p => p.categoryId === cat.id);
+        if (catProjs.length > 0) setSelectedProject(catProjs[0]);
+      }
+      setTimeout(() => {
+        document.getElementById("finder-window-section")?.scrollIntoView({ behavior: "smooth" });
+      }, 100);
+    } else if (lowerMenu === "ABOUT") {
+      setShowAboutModal(true);
+    } else if (lowerMenu === "CONTACT") {
+      setShowContactModal(true);
+    }
+  };
+
+  // Filter selected project images to only show user-uploaded base64 images
+  const uploadedImages = selectedProject
+    ? (selectedProject.images || []).filter(img => img.startsWith("data:") || img.startsWith("blob:"))
+    : [];
+
   return (
     <div className="min-h-screen bg-[#08090b] text-zinc-100 flex flex-col relative font-sans overflow-hidden select-none scanline">
       
@@ -377,41 +735,38 @@ export default function App() {
       <div className="absolute top-1/3 left-1/4 w-[500px] h-[500px] bg-sky-500/5 rounded-full blur-[140px] pointer-events-none"></div>
       <div className="absolute bottom-10 right-10 w-[400px] h-[400px] bg-blue-500/5 rounded-full blur-[120px] pointer-events-none"></div>
 
-      {/* FIXED TOP MENU BAR - Simulation of High-end CAD OS Interface */}
-      <header className="w-full h-11 border-b border-sky-950/40 bg-[#0a0d12]/90 backdrop-blur-md px-4 flex items-center justify-between text-xs font-mono tracking-wider z-40 select-none">
-        <div className="flex items-center gap-6">
-          <div className="flex items-center gap-2 text-sky-400 font-bold">
-            <Cpu className="w-4 h-4 animate-spin" style={{ animationDuration: '6s' }} />
-            <span className="tracking-widest">ARCH-WORKSTATION v4.9</span>
+      {/* FIXED TOP MENU BAR - Refined Professional Portfolio Header */}
+      <header className="w-full min-h-12 border-b border-zinc-900 bg-[#07090c]/90 backdrop-blur-md px-4 py-2 flex flex-col md:flex-row items-center justify-between text-xs font-mono tracking-wider z-40 select-none gap-3 md:gap-0">
+        <div className="flex items-center justify-between w-full md:w-auto gap-4">
+          <div className="flex items-center gap-2.5 text-sky-400 font-bold font-sans tracking-wide">
+            <span className="w-2 h-2 rounded-full bg-sky-400 animate-pulse"></span>
+            <span className="text-[11px] uppercase text-zinc-200 tracking-[0.18em]">SOYOUNG KIM <span className="text-sky-500/80 mx-0.5">·</span> SPACE DESIGN PORTFOLIO</span>
           </div>
-          <nav className="hidden md:flex items-center gap-5 text-zinc-400">
-            <span className="hover:text-sky-400 cursor-pointer transition-colors">File</span>
-            <span className="hover:text-sky-400 cursor-pointer transition-colors">Edit</span>
-            <span className="hover:text-sky-400 cursor-pointer transition-colors">View</span>
-            <span className="hover:text-sky-400 cursor-pointer transition-colors">History</span>
-            <span className="hover:text-sky-400 cursor-pointer transition-colors">Window</span>
-            <span 
-              onClick={() => {
-                alert("SPACE DESIGN ARCHIVE WORKSTATION\n--------------------------------\n• AutoCAD & SketchUp 기반 포트폴리오 뷰어\n• 가상 공간 동선 & 관람 흐름 특화 레이아웃\n• 관리 비밀번호: 1111");
-              }} 
-              className="hover:text-sky-400 cursor-pointer transition-colors flex items-center gap-1 text-sky-500/80"
-            >
-              <HelpCircle className="w-3.5 h-3.5" />
-              Help
-            </span>
-          </nav>
         </div>
+
+        {/* Dynamic Navigation Menus */}
+        <nav className="flex flex-wrap items-center justify-center gap-x-5 gap-y-1.5 text-zinc-400 text-[10px] uppercase font-bold tracking-widest">
+          {["WORK", "PROJECTS", "RESEARCH", "PROCESS", "VISUALIZATION", "ABOUT", "CONTACT"].map((menu) => (
+            <span 
+              key={menu}
+              onClick={() => handleNavClick(menu)}
+              className="hover:text-sky-400 cursor-pointer transition-colors duration-200 py-1"
+            >
+              {menu}
+            </span>
+          ))}
+        </nav>
 
         {/* Top bar right area */}
         <div className="flex items-center gap-4">
-          {/* Admin Indicator button */}
+          {/* Admin Indicator (Sleek and professional) */}
           {isAdmin ? (
-            <div className="flex items-center gap-2 bg-emerald-950/40 border border-emerald-500/40 px-3 py-1 rounded text-emerald-400 text-[10px] font-bold">
-              <Shield className="w-3.5 h-3.5 text-emerald-400 animate-pulse" />
-              <span>ADMIN: PRIVILEGED</span>
+            <div className="flex items-center gap-1.5 bg-emerald-950/20 border border-emerald-500/30 px-2 py-0.5 rounded text-emerald-400 text-[9px] font-bold">
+              <Shield className="w-3 h-3 text-emerald-400" />
+              <span>SECURE CONSOLE</span>
               <button 
                 onClick={handleAdminLogout} 
-                className="ml-1 bg-emerald-800/60 hover:bg-emerald-700 text-white px-1.5 py-0.2 rounded text-[9px] uppercase tracking-normal"
+                className="ml-1 text-zinc-400 hover:text-white uppercase text-[8px] underline"
               >
                 Exit
               </button>
@@ -419,21 +774,17 @@ export default function App() {
           ) : (
             <button 
               onClick={() => setShowAdminModal(true)}
-              className="flex items-center gap-1.5 bg-zinc-900 hover:bg-sky-950/40 border border-zinc-800 hover:border-sky-500/30 px-3 py-1 rounded text-zinc-400 hover:text-sky-400 transition-all text-[10px]"
+              className="flex items-center gap-1 bg-zinc-950/80 hover:bg-sky-950/20 border border-zinc-900 hover:border-sky-500/20 px-2 py-0.5 rounded text-zinc-500 hover:text-sky-400 transition-all text-[9px]"
+              title="Console login"
             >
-              <Settings className="w-3 h-3 text-sky-500/70" />
-              <span>Admin Login</span>
+              <Settings className="w-2.5 h-2.5 text-zinc-600 group-hover:text-sky-400" />
+              <span>CONSOLE</span>
             </button>
           )}
 
-          <div className="hidden lg:flex items-center gap-2 bg-[#090b0e] px-2.5 py-1 rounded border border-zinc-800 text-[10px] text-zinc-500">
-            <span>SYS_STATUS:</span>
-            <span className="text-emerald-400 font-bold">{connectionStatus}</span>
-          </div>
-
           {/* Clock */}
-          <div className="flex items-center gap-2 text-sky-400 bg-sky-950/10 px-3 py-1 rounded border border-sky-900/20 font-bold">
-            <Clock className="w-3.5 h-3.5 text-sky-400/80" />
+          <div className="flex items-center gap-1.5 text-sky-400/80 bg-sky-950/5 px-2.5 py-0.5 rounded border border-sky-950/10 font-bold text-[9px]">
+            <Clock className="w-3 h-3 text-sky-500/60" />
             <span className="tabular-nums">{time || "08:08:54"}</span>
           </div>
         </div>
@@ -441,13 +792,13 @@ export default function App() {
 
       {/* NOTIFICATION OVERLAY POPUP */}
       {notification && (
-        <div className="fixed top-14 left-1/2 transform -translate-x-1/2 bg-[#06090e] border-l-4 border-sky-400 text-sky-300 px-6 py-3 rounded shadow-2xl z-50 flex items-center gap-3 font-mono text-xs tracking-wide max-w-lg w-full animate-bounce">
-          <Terminal className="w-5 h-5 text-sky-400 shrink-0" />
+        <div className="fixed top-14 left-1/2 transform -translate-x-1/2 bg-[#06090e] border-l-2 border-sky-400 text-sky-300 px-6 py-3 rounded shadow-2xl z-50 flex items-center gap-3 font-mono text-xs tracking-wide max-w-lg w-full">
+          <Terminal className="w-4 h-4 text-sky-400 shrink-0" />
           <div className="flex-1">
-            <p className="font-bold text-[10px] text-zinc-400">ARCH-SYSTEM TELEMETRY</p>
+            <p className="font-bold text-[9px] text-zinc-500 tracking-wider">PORTFOLIO CONSOLE MESSAGE</p>
             <p>{notification}</p>
           </div>
-          <button onClick={() => setNotification(null)} className="text-zinc-400 hover:text-white">
+          <button onClick={() => setNotification(null)} className="text-zinc-500 hover:text-white">
             <X className="w-4 h-4" />
           </button>
         </div>
@@ -459,41 +810,56 @@ export default function App() {
         {/* UPPER MAIN SECTION: TITLE & FOLDERS */}
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-start">
           
-          {/* LEFT COLUMN: VERY LARGE HIGH-END ARCHITECTURAL TYPOGRAPHY WITH SPACHIOUS LINE HEIGHT */}
-          <div className="lg:col-span-5 flex flex-col justify-between h-full pt-4 md:pt-8" id="hero-title-block">
+          {/* LEFT COLUMN: VERY LARGE HIGH-END ARCHITECTURAL TYPOGRAPHY */}
+          <div className="lg:col-span-5 flex flex-col justify-between h-full pt-2 md:pt-4" id="hero-title-block">
             <div>
               {/* Architectural Coord Tag */}
-              <div className="font-mono text-[9px] text-sky-500/60 mb-4 tracking-[0.25em] uppercase flex items-center gap-1.5">
-                <span className="w-1.5 h-1.5 bg-sky-400 inline-block"></span>
-                <span>YEONGJUN KIM • PORTFOLIO CORE [41.7]</span>
+              <div className="font-mono text-[9px] text-sky-500/40 mb-3 tracking-[0.25em] uppercase flex items-center gap-1.5">
+                <span className="w-1.5 h-1.5 bg-sky-400/80 inline-block"></span>
+                <span>SOYOUNG KIM · SPACE DESIGN PORTFOLIO</span>
               </div>
               
-              {/* Very large typography with high line spacing (행간을 많이 띄운 대형 타이포그래피) */}
-              <h1 className="font-display font-light text-5xl md:text-6xl lg:text-7xl tracking-[0.16em] text-zinc-100 flex flex-col leading-[1.65] md:leading-[1.75]">
-                <span className="text-transparent bg-clip-text bg-gradient-to-r from-zinc-100 via-zinc-200 to-sky-400">SPACE</span>
-                <span className="font-semibold text-transparent bg-clip-text bg-gradient-to-r from-sky-400 to-zinc-400">DESIGN</span>
-                <span className="tracking-[0.2em] text-zinc-500 hover:text-sky-400 transition-colors duration-500">PORTFOLIO</span>
+              {/* Very large typography with high line spacing */}
+              <h1 className="font-display font-light text-5xl md:text-6xl lg:text-[76px] tracking-[0.16em] text-zinc-100 flex flex-col leading-[1.4] md:leading-[1.5]">
+                <span className="text-transparent bg-clip-text bg-gradient-to-r from-zinc-100 via-zinc-200 to-sky-400 font-extralight">SPACE</span>
+                <span className="font-bold text-transparent bg-clip-text bg-gradient-to-r from-sky-400 to-zinc-400 tracking-[0.18em]">DESIGN</span>
+                <span className="tracking-[0.03em] text-zinc-600 hover:text-sky-400 transition-colors duration-700">PORTFOLIO</span>
               </h1>
 
-              {/* Subtitle / Manifesto in bilingual (Korean & English) */}
-              <div className="mt-8 md:mt-12 space-y-4 max-w-md border-l border-sky-950/60 pl-4 py-2">
-                <p className="text-zinc-400 text-xs md:text-sm leading-relaxed tracking-wide">
-                  “저는 공간 기획, 도면화, 3D 모델링, VR 시뮬레이션을 통해 사용자가 경험하는 공간을 설계합니다.”
+              {/* Subtitle / Manifesto */}
+              <div className="mt-6 md:mt-8 border-l-2 border-sky-500/20 pl-4 py-1.5">
+                <p className="text-sky-400 font-semibold text-xs tracking-[0.22em] font-mono uppercase">
+                  EXHIBITION · INTERIOR · 3D VISUALIZATION
                 </p>
-                <p className="text-zinc-500 text-[11px] font-mono leading-relaxed italic">
-                  “I design spatial experiences through planning, drawing, 3D modeling, and virtual simulation.”
+                <p className="text-zinc-400 text-xs tracking-wider mt-2 leading-relaxed">
+                  Designing immersive spatial experiences through storytelling, exhibition planning, and visual communication.
                 </p>
+              </div>
+
+              {/* Action Buttons */}
+              <div className="mt-8 flex flex-wrap gap-3">
+                <button 
+                  onClick={() => handleNavClick("WORK")}
+                  className="bg-sky-500/10 hover:bg-sky-500/20 border border-sky-400/40 hover:border-sky-400 text-sky-300 hover:text-white px-5 py-2.5 text-[11px] font-bold font-mono tracking-widest transition-all duration-300 rounded shadow-[0_0_15px_rgba(56,189,248,0.05)] hover:shadow-[0_0_20px_rgba(56,189,248,0.25)]"
+                >
+                  VIEW PROJECTS
+                </button>
+                <button 
+                  onClick={handleDownloadPDF}
+                  className="bg-zinc-900/60 hover:bg-zinc-800 border border-zinc-800 hover:border-zinc-700 text-zinc-300 hover:text-white px-5 py-2.5 text-[11px] font-bold font-mono tracking-widest transition-all duration-300 rounded"
+                >
+                  DOWNLOAD PDF
+                </button>
+                <button 
+                  onClick={() => handleNavClick("CONTACT")}
+                  className="bg-zinc-900/60 hover:bg-sky-950/20 border border-zinc-800 hover:border-sky-500/30 text-zinc-400 hover:text-sky-300 px-5 py-2.5 text-[11px] font-bold font-mono tracking-widest transition-all duration-300 rounded"
+                >
+                  CONTACT
+                </button>
               </div>
             </div>
 
-            {/* Simulated Live CAD Viewport embed on the left side to reinforce technical architecture theme */}
-            <div className="mt-8 hidden lg:block">
-              <div className="text-[10px] font-mono text-zinc-500 mb-2 flex items-center gap-2">
-                <Layers className="w-3.5 h-3.5 text-sky-500" />
-                <span>DYNAMIC SPACIAL WIREFRAME ANALYSIS</span>
-              </div>
-              <CADViewport />
-            </div>
+
           </div>
 
           {/* RIGHT COLUMN: REVOLUTIONARY Apple Finder / CAD WORKSTATION FOLDER SELECTIONS */}
@@ -522,7 +888,7 @@ export default function App() {
               </div>
             </div>
 
-            {/* Folder Grid - Elegant 3D / CAD Minimalistic graphic button frames */}
+            {/* Folder Grid - Elegant Architectural Folder Cards with Mini Blueprints */}
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               {categories.map((cat) => {
                 const projectCount = projects.filter(p => p.categoryId === cat.id).length;
@@ -539,17 +905,15 @@ export default function App() {
                       } else {
                         setSelectedProject(null);
                       }
-                      // Smooth scroll down to window if on mobile
-                      if (window.innerWidth < 1024) {
-                        setTimeout(() => {
-                          document.getElementById("finder-window-section")?.scrollIntoView({ behavior: "smooth" });
-                        }, 150);
-                      }
+                      // Immediately smooth scroll down to the workspace section for seamless viewing
+                      setTimeout(() => {
+                        document.getElementById("finder-window-section")?.scrollIntoView({ behavior: "smooth" });
+                      }, 100);
                     }}
-                    className={`group relative p-4 rounded-xl border transition-all duration-300 cursor-pointer overflow-hidden ${
+                    className={`group relative p-5 rounded-xl border transition-all duration-300 cursor-pointer overflow-hidden ${
                       selectedCategory?.id === cat.id 
-                        ? "bg-[#0f141c] border-sky-400 shadow-[0_0_15px_rgba(56,189,248,0.15)] translate-y-[-4px]" 
-                        : "bg-[#0b0c0e] hover:bg-[#0f1115] border-zinc-800 hover:border-sky-500/30 hover:shadow-[0_4px_12px_rgba(56,189,248,0.06)] hover:translate-y-[-3px]"
+                        ? "bg-[#0c1017] border-sky-400 shadow-[0_0_25px_rgba(56,189,248,0.12)] translate-y-[-4px]" 
+                        : "bg-[#080a0c] hover:bg-[#0c0e12] border-zinc-900 hover:border-sky-500/30 hover:shadow-[0_4px_20px_rgba(56,189,248,0.08)] hover:translate-y-[-3px]"
                     }`}
                   >
                     {/* Folder Corner Accent Line */}
@@ -557,41 +921,100 @@ export default function App() {
                     <div className="absolute top-0 right-0 h-8 w-[1px] bg-gradient-to-b from-sky-400/40 to-transparent"></div>
 
                     <div className="flex items-start justify-between">
-                      {/* Technical Folder Code Tag */}
-                      <span className="font-mono text-[9px] font-bold text-zinc-500 group-hover:text-sky-400 transition-colors">
-                        SYS_LOC // 00{cat.id}
+                      {/* Category ID */}
+                      <span className="font-mono text-[10px] font-bold text-sky-500/80 tracking-wider">
+                        CAT // {cat.num}
                       </span>
                       
                       {/* Project count indicator badge */}
-                      <span className="font-mono text-[9px] bg-zinc-900 border border-zinc-800 px-1.5 py-0.5 rounded text-zinc-400">
-                        {cat.id === "08" ? "PROFILE" : `${projectCount} PLOTS`}
+                      <span className="font-mono text-[9px] bg-zinc-950/80 border border-zinc-900 px-2 py-0.5 rounded text-zinc-400 tracking-wider">
+                        {cat.id === "08" ? "PROFILE" : `${projectCount} PROJECTS`}
                       </span>
                     </div>
 
-                    {/* Main Category Title Block */}
-                    <div className="mt-4 flex items-center gap-3">
-                      {/* Elegant Mini Custom Folder Icon */}
-                      <div className="p-2.5 rounded-lg bg-sky-950/30 border border-sky-900/20 group-hover:bg-sky-950/50 group-hover:border-sky-400/30 transition-all">
-                        <Folder className="w-5 h-5 text-sky-400 group-hover:scale-110 transition-transform" />
-                      </div>
-                      
-                      <div className="flex-1 min-w-0">
-                        <h3 className="font-display text-sm font-semibold tracking-wide text-zinc-200 group-hover:text-white transition-colors flex items-center gap-1.5">
-                          <span className="text-sky-400/80 font-mono text-xs">{cat.num}</span>
-                          <span>{cat.title}</span>
-                        </h3>
-                        <p className="text-[11px] text-zinc-500 truncate group-hover:text-zinc-400 transition-colors mt-0.5">
-                          {cat.description}
-                        </p>
+                    {/* Architectural Vector Thumbnail Box / Upload Box */}
+                    <div 
+                      onClick={(e) => {
+                        e.stopPropagation(); // Prevent scroll jump!
+                        setSelectedCategory(cat); // But still select it!
+                        const catProjs = projects.filter(p => p.categoryId === cat.id);
+                        if (catProjs.length > 0) {
+                          setSelectedProject(catProjs[0]);
+                        } else {
+                          setSelectedProject(null);
+                        }
+                        document.getElementById(`file-upload-${cat.id}`)?.click();
+                      }}
+                      className="w-full h-24 bg-[#040608] hover:bg-[#070b11] border border-zinc-950 hover:border-sky-500/40 rounded-lg overflow-hidden flex items-center justify-center p-2 mt-3 mb-3 relative transition-all duration-300 cursor-pointer group/upload"
+                    >
+                      {/* Hidden File Input */}
+                      <input
+                        type="file"
+                        id={`file-upload-${cat.id}`}
+                        accept="image/png, image/jpeg, image/jpg, image/webp"
+                        className="hidden"
+                        onChange={(e) => handleCategoryIconUpload(cat.id, e)}
+                      />
+
+                      {cat.image ? (
+                        <div className="relative w-full h-full flex items-center justify-center">
+                          <img 
+                            src={cat.image} 
+                            alt={cat.title} 
+                            className="w-full h-full object-contain select-none"
+                            referrerPolicy="no-referrer"
+                          />
+                          {/* Hover change overlay indicator */}
+                          <div className="absolute inset-0 bg-black/60 opacity-0 group-hover/upload:opacity-100 flex items-center justify-center transition-opacity duration-200">
+                            <span className="text-[8px] font-mono text-sky-400 font-bold uppercase tracking-widest">
+                              CHANGE IMAGE
+                            </span>
+                          </div>
+                          
+                          {/* Delete button */}
+                          <button
+                            type="button"
+                            onClick={(e) => handleCategoryIconDelete(cat.id, e)}
+                            className="absolute top-1.5 right-1.5 p-1 bg-rose-950/80 hover:bg-rose-900 border border-rose-500/30 hover:border-rose-500 text-rose-300 hover:text-white rounded transition-all z-10"
+                            title="이미지 삭제"
+                          >
+                            <X className="w-3.5 h-3.5" />
+                          </button>
+                        </div>
+                      ) : (
+                        <div className="flex flex-col items-center justify-center gap-1.5 text-zinc-500 group-hover/upload:text-sky-400 transition-colors p-2 text-center select-none">
+                          <Upload className="w-4 h-4 text-zinc-600 group-hover/upload:text-sky-400/80 transition-colors animate-pulse" />
+                          <span className="text-[9px] font-mono tracking-wider font-bold uppercase">
+                            Click to upload project image
+                          </span>
+                        </div>
+                      )}
+
+                      {/* Coordinate Overlay */}
+                      <div className="absolute bottom-1 right-2 text-[6px] font-mono text-zinc-600 group-hover/upload:text-sky-500/40 transition-colors pointer-events-none">
+                        XYZ: 100.{cat.id} / 60.00
                       </div>
                     </div>
 
-                    {/* Bottom Status bar of folders */}
-                    <div className="mt-3 pt-2.5 border-t border-zinc-900/50 flex items-center justify-between text-[8px] font-mono text-zinc-600 group-hover:text-sky-400/50 transition-colors">
-                      <span>DRAFTING: COMPLETED</span>
-                      <span className="flex items-center gap-1">
-                        <span className="w-1 h-1 rounded-full bg-sky-500"></span>
-                        ONLINE
+                    {/* Thin cyan blue point line */}
+                    <div className="w-full h-[1px] bg-gradient-to-r from-sky-500/5 via-sky-400/40 to-transparent mb-3"></div>
+
+                    {/* Main Category Title Block */}
+                    <div className="flex-1 min-w-0">
+                      <h3 className="font-sans text-sm font-semibold tracking-wide text-zinc-200 group-hover:text-white transition-colors flex items-center gap-1.5">
+                        <span>{cat.title}</span>
+                      </h3>
+                      <p className="text-[11px] text-zinc-500 group-hover:text-zinc-400 transition-colors mt-1 leading-relaxed">
+                        {cat.description}
+                      </p>
+                    </div>
+
+                    {/* Bottom Status bar */}
+                    <div className="mt-4 pt-2.5 border-t border-zinc-900/40 flex items-center justify-between text-[8px] font-mono text-zinc-600 group-hover:text-sky-400/50 transition-colors">
+                      <span>SECURE ARCHIVE</span>
+                      <span className="flex items-center gap-1 font-mono">
+                        <span className="w-1 h-1 rounded-full bg-sky-500 group-hover:animate-ping"></span>
+                        READY
                       </span>
                     </div>
                   </div>
@@ -628,11 +1051,15 @@ export default function App() {
                   filteredSearchProjects.map(p => (
                     <div 
                       key={p.id}
-                      onClick={() => {
+                     onClick={() => {
                         const targetCat = categories.find(c => c.id === p.categoryId);
                         if (targetCat) setSelectedCategory(targetCat);
                         setSelectedProject(p);
                         setSearchQuery("");
+                        // Scroll down to window immediately
+                        setTimeout(() => {
+                          document.getElementById("finder-window-section")?.scrollIntoView({ behavior: "smooth" });
+                        }, 100);
                       }}
                       className="p-2 hover:bg-sky-950/20 border border-transparent hover:border-sky-500/20 rounded cursor-pointer transition-colors flex items-center justify-between text-xs"
                     >
@@ -683,7 +1110,7 @@ export default function App() {
                 </div>
 
                 {/* Optional Admin Action inside active Window */}
-                {isAdmin && selectedCategory.id !== "08" && (
+                {isAdmin && (
                   <button 
                     onClick={openAddProject}
                     className="flex items-center gap-1 bg-sky-950/80 border border-sky-400/30 text-sky-300 hover:bg-sky-900 px-2.5 py-1 rounded text-[10px] font-mono font-bold transition-all"
@@ -695,7 +1122,7 @@ export default function App() {
               </div>
 
               {/* WINDOW WORKSPACE PANEL CONTAINER */}
-              {selectedCategory.id === "08" ? (
+              {false ? (
                 
                 /* SPECIAL CATEGORY: 08 ABOUT ME (PROFILE WINDOW) */
                 <div className="p-6 md:p-8 grid grid-cols-1 lg:grid-cols-12 gap-8 bg-[#090b0e]">
@@ -799,26 +1226,23 @@ export default function App() {
                       
                       <div className="mt-4 space-y-4 text-xs text-zinc-400 leading-relaxed font-sans">
                         <p>
-                          저는 단순한 장식으로서의 인테리어가 아닌, 브랜드의 가치와 관람객의 최적 동선 시나리오가 유기적으로 얽힌 <strong>'실재하는 시각적 스토리텔링'</strong>을 설계합니다. 
+                          브랜드 가치와 유기적인 동선 시나리오를 바탕으로 한 실재하는 공간 설계.
                         </p>
                         <p>
-                          현재 학원에서 <strong>AutoCAD</strong>를 통해 가구 철구조 및 상세 단면 도면 작도법을 깊이 있게 연마하고 있으며, <strong>SketchUp 컴포넌트 모델링</strong>과 <strong>Enscape 실시간 렌더링</strong>을 적용해 가공되지 않은 3D 날것의 시공 정밀성을 보장합니다.
-                        </p>
-                        <p>
-                          더 나아가 가상 공간(VR HMD) 환경에 대비하여 사용자의 시선 피로, 조도 변화율, 멀미 저항 반경을 과학적으로 계산하는 <strong>체험형 시뮬레이션</strong> 능력을 축적하고 있습니다. 실제 전시장 시공이 완벽하게 구현되도록 끝까지 조율 가능한 주도적 신입 디자이너를 목표로 합니다.
+                          AutoCAD 도면화, SketchUp 컴포넌트 모델링, Enscape 실시간 렌더링을 통한 정밀 시공성 확보.
                         </p>
                       </div>
                     </div>
 
                     <div className="p-6 rounded-lg border border-zinc-800 bg-[#0a0d11]">
-                      <h3 className="font-display text-base font-bold text-zinc-200 mb-4">학습 & 훈련 성과 (Academy Achievements)</h3>
+                      <h3 className="font-display text-base font-bold text-zinc-200 mb-4">훈련 분야 (Academy Achievements)</h3>
                       <div className="space-y-4 font-mono text-xs">
                         <div className="flex gap-4">
                           <span className="text-sky-400 font-bold shrink-0">PRESENT</span>
                           <div>
                             <p className="text-zinc-100 font-bold">Space & Exhibition Design Master Class</p>
                             <p className="text-zinc-500 mt-1">
-                              SketchUp Pro 고난도 3D 모델링 스터디, AutoCAD 정밀 도면집(Floor / RCP / Elevation) 드래프팅 훈련 이수 중. Enscape/Twinmotion 연동 고해상도 공간 렌더링 및 VR 시선 앵커 시뮬레이션 구현.
+                              SketchUp Pro 고난도 3D 모델링, AutoCAD 도면 드래프팅 훈련, Enscape 및 VR 공간 렌더링 시뮬레이션 구현.
                             </p>
                           </div>
                         </div>
@@ -827,7 +1251,7 @@ export default function App() {
                           <div>
                             <p className="text-zinc-100 font-bold">Spatial Zoning & Visitor Flow Analytics</p>
                             <p className="text-zinc-500 mt-1">
-                              관람자 동선 분산 계획(Circulation Zoning), 전시 그래픽 및 웨이파인딩 사인 시스템 연구, 가변형 전시 벽체(Pivot Wall)의 공학적 회전 반경 계산 모형 구축.
+                              관람자 동선 분산 계획(Circulation), 공간 사인 시스템 연구, 가변 전시 벽체(Pivot Wall) 회전 설계.
                             </p>
                           </div>
                         </div>
@@ -858,7 +1282,15 @@ export default function App() {
                         activeCategoryProjects.map((proj) => (
                           <div
                             key={proj.id}
-                            onClick={() => setSelectedProject(proj)}
+                            onClick={() => {
+                              setSelectedProject(proj);
+                              // Smooth scroll to the project details section, especially useful on mobile/small screens where they are stacked vertically.
+                              if (window.innerWidth < 1024) {
+                                setTimeout(() => {
+                                  document.getElementById("project-detail-view")?.scrollIntoView({ behavior: "smooth" });
+                                }, 100);
+                              }
+                            }}
                             className={`p-3 rounded-lg border cursor-pointer text-left transition-all ${
                               selectedProject?.id === proj.id
                                 ? "bg-sky-950/30 border-sky-500 text-white"
@@ -885,7 +1317,7 @@ export default function App() {
                   </div>
 
                   {/* Right panel of Drawer: Active Deep-Dive Blueprint Viewer & Information Block */}
-                  <div className="flex-1 p-5 md:p-8 space-y-8 overflow-y-auto max-h-[750px] bg-[#08090c]">
+                  <div id="project-detail-view" className="flex-1 p-5 md:p-8 space-y-8 overflow-y-auto max-h-[750px] bg-[#08090c]">
                     
                     {selectedProject ? (
                       <div className="space-y-8">
@@ -938,80 +1370,155 @@ export default function App() {
                         </div>
 
                         {/* Portfolio Render Showcase */}
-                        {selectedProject.images && selectedProject.images.length > 0 ? (
-                          <div className="space-y-3 font-mono">
-                            <div className="flex items-center justify-between">
-                              <h4 className="text-[10px] text-sky-400 font-bold uppercase tracking-widest flex items-center gap-1.5">
-                                <Sparkles className="w-4 h-4 text-sky-400" />
-                                <span>REAL-TIME 3D SPATIAL RENDERS ({selectedProject.images.length})</span>
-                              </h4>
-                              <span className="text-[9px] text-zinc-500">PLOT_ID: {selectedProject.id}_VISUALS</span>
-                            </div>
-
-                            {/* Main Large Visual frame */}
-                            <div className="relative aspect-[16/9] w-full bg-zinc-950/40 border border-zinc-900 rounded-lg overflow-hidden group/img">
-                              {/* CAD technical coordinate lines overlay */}
-                              <div className="absolute inset-0 pointer-events-none border border-dashed border-sky-500/5 cad-grid"></div>
-                              <div className="absolute top-2 left-2 pointer-events-none bg-black/70 border border-zinc-800 px-2 py-0.5 rounded text-[8px] text-sky-400">
-                                SYS_RENDER_VIEWPORT [ACTIVE]
-                              </div>
-                              <div className="absolute bottom-2 right-2 pointer-events-none bg-black/70 border border-zinc-800 px-2 py-0.5 rounded text-[8px] text-zinc-500">
-                                REF: {activeImageIndex + 1} / {selectedProject.images.length}
-                              </div>
-
-                              <img 
-                                src={selectedProject.images[activeImageIndex]} 
-                                alt={`${selectedProject.title} rendering`}
-                                referrerPolicy="no-referrer"
-                                className="w-full h-full object-cover select-none"
-                              />
-
-                              {/* Prev / Next buttons inside viewport */}
-                              {selectedProject.images.length > 1 && (
-                                <>
-                                  <button 
-                                    type="button"
-                                    onClick={() => setActiveImageIndex(prev => (prev - 1 + selectedProject.images!.length) % selectedProject.images!.length)}
-                                    className="absolute left-2.5 top-1/2 -translate-y-1/2 p-2 rounded-full bg-black/75 hover:bg-sky-950/90 border border-zinc-800 hover:border-sky-500/40 text-zinc-400 hover:text-sky-400 transition-all opacity-0 group-hover/img:opacity-100"
-                                  >
-                                    <ChevronLeft className="w-4 h-4" />
-                                  </button>
-                                  <button 
-                                    type="button"
-                                    onClick={() => setActiveImageIndex(prev => (prev + 1) % selectedProject.images!.length)}
-                                    className="absolute right-2.5 top-1/2 -translate-y-1/2 p-2 rounded-full bg-black/75 hover:bg-sky-950/90 border border-zinc-800 hover:border-sky-500/40 text-zinc-400 hover:text-sky-400 transition-all opacity-0 group-hover/img:opacity-100"
-                                  >
-                                    <ChevronRight className="w-4 h-4" />
-                                  </button>
-                                </>
-                              )}
-                            </div>
-
-                            {/* Small thumbnails bar */}
-                            {selectedProject.images.length > 1 && (
-                              <div className="flex gap-2 overflow-x-auto pb-1 max-w-full">
-                                {selectedProject.images.map((img, idx) => (
-                                  <button
-                                    key={idx}
-                                    onClick={() => setActiveImageIndex(idx)}
-                                    className={`relative w-20 aspect-[16/9] rounded border overflow-hidden shrink-0 transition-all ${
-                                      activeImageIndex === idx 
-                                        ? "border-sky-400 scale-[1.02] shadow-[0_0_8px_rgba(56,189,248,0.3)]" 
-                                        : "border-zinc-800 hover:border-sky-500/50"
-                                    }`}
-                                  >
-                                    <img 
-                                      src={img} 
-                                      alt="thumbnail" 
-                                      referrerPolicy="no-referrer"
-                                      className="w-full h-full object-cover" 
-                                    />
-                                  </button>
-                                ))}
-                              </div>
-                            )}
+                        <div className="space-y-3 font-mono">
+                          <div className="flex items-center justify-between">
+                            <h4 className="text-[10px] text-sky-400 font-bold uppercase tracking-widest flex items-center gap-1.5">
+                              <Sparkles className="w-4 h-4 text-sky-400" />
+                              <span>REAL-TIME 3D SPATIAL RENDERS ({uploadedImages.length})</span>
+                            </h4>
+                            <span className="text-[9px] text-zinc-500">PLOT_ID: {selectedProject.id}_VISUALS</span>
                           </div>
-                        ) : null}
+
+                          {uploadedImages.length > 0 ? (
+                            <>
+                              {/* Main Large Visual frame */}
+                              <div className="relative aspect-[16/9] w-full bg-zinc-950/40 border border-zinc-900 rounded-lg overflow-hidden group/img">
+                                {/* CAD technical coordinate lines overlay */}
+                                <div className="absolute inset-0 pointer-events-none border border-dashed border-sky-500/5 cad-grid"></div>
+                                <div className="absolute top-2 left-2 pointer-events-none bg-black/70 border border-zinc-800 px-2 py-0.5 rounded text-[8px] text-sky-400">
+                                  SYS_RENDER_VIEWPORT [ACTIVE]
+                                </div>
+
+                                <button
+                                  type="button"
+                                  onClick={(e) => {
+                                    e.stopPropagation();
+                                    handleDirectImageDelete(activeImageIndex);
+                                  }}
+                                  className="absolute top-2 right-2 p-1.5 rounded bg-rose-950/80 hover:bg-rose-900 border border-rose-500/40 text-rose-300 hover:text-rose-100 transition-all text-[8px] font-mono flex items-center gap-1 z-10"
+                                  title="현재 이미지 삭제"
+                                >
+                                  <Trash2 className="w-3 h-3" />
+                                  <span className="hidden sm:inline">DELETE</span>
+                                </button>
+
+                                <div className="absolute bottom-2 right-2 pointer-events-none bg-black/70 border border-zinc-800 px-2 py-0.5 rounded text-[8px] text-zinc-500">
+                                  REF: {activeImageIndex + 1} / {uploadedImages.length}
+                                </div>
+
+                                <img 
+                                  src={uploadedImages[activeImageIndex]} 
+                                  alt={`${selectedProject.title} rendering`}
+                                  referrerPolicy="no-referrer"
+                                  className="w-full h-full object-cover select-none"
+                                />
+
+                                {/* Prev / Next buttons inside viewport */}
+                                {uploadedImages.length > 1 && (
+                                  <>
+                                    <button 
+                                      type="button"
+                                      onClick={() => setActiveImageIndex(prev => (prev - 1 + uploadedImages.length) % uploadedImages.length)}
+                                      className="absolute left-2.5 top-1/2 -translate-y-1/2 p-2 rounded-full bg-black/75 hover:bg-sky-950/90 border border-zinc-800 hover:border-sky-500/40 text-zinc-400 hover:text-sky-400 transition-all opacity-0 group-hover/img:opacity-100"
+                                    >
+                                      <ChevronLeft className="w-4 h-4" />
+                                    </button>
+                                    <button 
+                                      type="button"
+                                      onClick={() => setActiveImageIndex(prev => (prev + 1) % uploadedImages.length)}
+                                      className="absolute right-2.5 top-1/2 -translate-y-1/2 p-2 rounded-full bg-black/75 hover:bg-sky-950/90 border border-zinc-800 hover:border-sky-500/40 text-zinc-400 hover:text-sky-400 transition-all opacity-0 group-hover/img:opacity-100"
+                                    >
+                                      <ChevronRight className="w-4 h-4" />
+                                    </button>
+                                  </>
+                                )}
+                              </div>
+
+                              {/* Small thumbnails bar */}
+                              {uploadedImages.length > 1 && (
+                                <div className="flex gap-2 overflow-x-auto pb-1 max-w-full">
+                                  {uploadedImages.map((img, idx) => (
+                                    <button
+                                      key={idx}
+                                      onClick={() => setActiveImageIndex(idx)}
+                                      className={`relative w-20 aspect-[16/9] rounded border overflow-hidden shrink-0 transition-all ${
+                                        activeImageIndex === idx 
+                                          ? "border-sky-400 scale-[1.02] shadow-[0_0_8px_rgba(56,189,248,0.3)]" 
+                                          : "border-zinc-800 hover:border-sky-500/50"
+                                      }`}
+                                    >
+                                      <img 
+                                        src={img} 
+                                        alt="thumbnail" 
+                                        referrerPolicy="no-referrer"
+                                        className="w-full h-full object-cover" 
+                                      />
+                                    </button>
+                                  ))}
+                                </div>
+                              )}
+                            </>
+                          ) : (
+                            <div className="w-full aspect-[16/9] bg-zinc-950/40 border border-dashed border-zinc-850 rounded-lg flex flex-col items-center justify-center p-6 text-center">
+                              <Upload className="w-8 h-8 text-zinc-650 mb-2 animate-pulse" />
+                              <p className="text-xs text-zinc-400 font-sans">등록된 포트폴리오 이미지가 없습니다.</p>
+                              <p className="text-[10px] text-zinc-500 mt-1 font-sans">아래 업로드 구역에서 컴퓨터의 이미지를 드래그하거나 선택하여 첫 이미지를 추가하세요.</p>
+                            </div>
+                          )}
+
+                          {/* Direct Drag & Drop / Click Upload Area */}
+                          <div 
+                            onDragOver={(e) => {
+                              e.preventDefault();
+                              setIsDetailDragging(true);
+                            }}
+                            onDragLeave={() => setIsDetailDragging(false)}
+                            onDrop={(e) => {
+                              e.preventDefault();
+                              setIsDetailDragging(false);
+                              if (e.dataTransfer.files) {
+                                handleDirectImageUpload(e.dataTransfer.files);
+                              }
+                            }}
+                            className={`p-4 rounded-lg border border-dashed transition-all ${
+                              isDetailDragging 
+                                ? "border-sky-400 bg-sky-950/25" 
+                                : "border-sky-950/40 bg-[#090c10]/40 hover:bg-[#0c1015]/40"
+                            }`}
+                          >
+                            <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
+                              <div className="space-y-1 text-center sm:text-left">
+                                <div className="flex items-center justify-center sm:justify-start gap-1.5 text-[11px] text-zinc-300 font-bold">
+                                  <Upload className="w-4 h-4 text-sky-400" />
+                                  <span>내 컴퓨터 이미지 다중 첨부 (Drag & Drop)</span>
+                                </div>
+                                <p className="text-[10px] text-zinc-500 font-sans">
+                                  이미지 파일들을 여기로 드래그하거나 컴퓨터에서 선택하세요. (JPEG, PNG 등 다중 선택 가능)
+                                </p>
+                              </div>
+                              <button
+                                type="button"
+                                onClick={() => document.getElementById("direct-detail-upload")?.click()}
+                                className="w-full sm:w-auto px-4 py-1.5 rounded bg-[#0e1724] hover:bg-[#132236] border border-sky-500/30 text-sky-300 text-xs font-bold transition-all whitespace-nowrap shrink-0 flex items-center justify-center gap-1.5 shadow-[0_0_12px_rgba(56,189,248,0.1)] hover:shadow-[0_0_15px_rgba(56,189,248,0.2)]"
+                              >
+                                <Plus className="w-3.5 h-3.5" />
+                                <span>컴퓨터 파일 선택</span>
+                              </button>
+                              <input
+                                type="file"
+                                id="direct-detail-upload"
+                                multiple
+                                accept="image/*"
+                                onChange={(e) => {
+                                  if (e.target.files) {
+                                    handleDirectImageUpload(e.target.files);
+                                  }
+                                }}
+                                className="hidden"
+                              />
+                            </div>
+                          </div>
+                        </div>
 
                         {/* Concept Block with Premium styling */}
                         <div className="grid grid-cols-1 md:grid-cols-12 gap-6 bg-[#0c0f16] border border-sky-950/20 p-5 rounded-lg">
@@ -1023,29 +1530,7 @@ export default function App() {
                           </div>
                         </div>
 
-                        {/* Interactive CAD Blueprint Drawing (SVG Renderer) */}
-                        {selectedProject.drawings && selectedProject.drawings[0] && (
-                          <div className="space-y-3">
-                            <div className="flex items-center justify-between">
-                              <h4 className="font-mono text-[10px] text-sky-400 font-bold uppercase tracking-widest flex items-center gap-1.5">
-                                <FileCode className="w-4 h-4 text-sky-400" />
-                                <span>INTERACTIVE BLUEPRINT DRAFT (VECTOR CAD)</span>
-                              </h4>
-                              <span className="text-[9px] font-mono text-zinc-500">AUTO-SCALED GRAPHIC</span>
-                            </div>
 
-                            <CADDrawings type={selectedProject.drawings[0].svgType} />
-                            
-                            <div className="p-3 bg-[#0a0d13] border border-zinc-900 rounded-lg">
-                              <p className="text-[10px] font-mono text-zinc-500 font-bold">
-                                DRAWING ANALYSIS NOTE:
-                              </p>
-                              <p className="text-xs text-zinc-400 mt-1">
-                                {selectedProject.drawings[0].description}
-                              </p>
-                            </div>
-                          </div>
-                        )}
 
                         {/* Space Zoning & Audience flow */}
                         {selectedProject.userFlow && selectedProject.userFlow.length > 0 && (
@@ -1192,7 +1677,7 @@ export default function App() {
             </div>
 
             <p className="text-zinc-400 leading-relaxed text-[11px]">
-              포트폴리오 내용 수정/추가 권한을 획득하기 위해 비밀번호를 입력해주십시오. (초기 관리번호: <span className="text-sky-400 font-bold">1111</span>)
+              포트폴리오 내용 수정/추가 권한을 획득하기 위해 비밀번호를 입력해주십시오.
             </p>
 
             <form onSubmit={handleAdminLogin} className="space-y-3">
@@ -1492,6 +1977,215 @@ export default function App() {
 
             </form>
 
+          </div>
+        </div>
+      )}
+
+      {/* ABOUT ME MODAL (HIGH-END SPATIAL DESIGNER ARCHIVE PROFILE) */}
+      {showAboutModal && (
+        <div className="fixed inset-0 bg-[#06080b]/95 backdrop-blur-md z-50 flex items-center justify-center p-4">
+          <div className="bg-[#090c10] border border-sky-500/20 max-w-2xl w-full rounded-lg shadow-2xl overflow-hidden font-mono text-zinc-300">
+            {/* Header */}
+            <div className="bg-[#0b0f15] px-4 py-3 border-b border-zinc-900 flex items-center justify-between">
+              <div className="flex items-center gap-2">
+                <span className="w-2.5 h-2.5 bg-sky-500 animate-pulse rounded-full"></span>
+                <span className="text-[10px] font-bold uppercase tracking-wider text-sky-400">ARCHIVE_BIO_SOYOUNG_KIM_REVISED.log</span>
+              </div>
+              <button 
+                onClick={() => setShowAboutModal(false)}
+                className="text-zinc-500 hover:text-white transition-colors"
+              >
+                <X className="w-4 h-4" />
+              </button>
+            </div>
+
+            {/* Content Container */}
+            <div className="p-6 md:p-8 space-y-6 max-h-[80vh] overflow-y-auto">
+              <div className="grid grid-cols-1 md:grid-cols-12 gap-6 items-start">
+                
+                {/* Visual Identity Profile Frame */}
+                <div className="md:col-span-5 space-y-4">
+                  <div className="relative p-1 rounded-md border border-sky-500/10 bg-zinc-950/60 aspect-[3/4] flex flex-col items-center justify-center overflow-hidden cad-grid">
+                    <div className="absolute top-2 left-2 text-[8px] text-zinc-600">CAD_PERSPECTIVE_01</div>
+                    <div className="absolute bottom-2 right-2 text-[8px] text-sky-500/50">SCALE 1:20</div>
+                    {/* Abstract Spatial Vector Icon */}
+                    <svg className="w-20 h-20 text-sky-400/20 animate-pulse" viewBox="0 0 100 100" fill="none" stroke="currentColor" strokeWidth="1">
+                      <polygon points="50,15 90,35 90,75 50,95 10,75 10,35" />
+                      <line x1="50" y1="15" x2="50" y2="95" strokeDasharray="2,2" />
+                      <line x1="10" y1="35" x2="90" y2="75" strokeDasharray="2,2" />
+                      <line x1="90" y1="35" x2="10,75" strokeDasharray="2,2" />
+                      <circle cx="50" cy="55" r="20" stroke="currentColor" strokeOpacity="0.4" />
+                    </svg>
+                  </div>
+                  <div className="text-center md:text-left">
+                    <h2 className="text-lg font-bold text-zinc-100 tracking-wide font-sans">김소영 (SOYOUNG KIM)</h2>
+                    <p className="text-[10px] text-sky-400 mt-1 uppercase tracking-widest font-mono">Exhibition & Space Experience Designer</p>
+                  </div>
+                </div>
+
+                {/* Profile Narrative Spec */}
+                <div className="md:col-span-7 space-y-4">
+                  <div>
+                    <h4 className="text-[10px] text-sky-400 font-bold uppercase tracking-wider mb-2 border-b border-zinc-900 pb-1 flex items-center gap-1.5">
+                      <Award className="w-3.5 h-3.5 text-sky-400" />
+                      <span>Professional Manifesto</span>
+                    </h4>
+                    <p className="text-[11px] leading-relaxed font-sans text-zinc-400">
+                      스토리텔링과 정교한 공간 기획, 3D 가상 시각화를 융합하여 몰입감 있는 전시 경험을 연출합니다. 
+                      관람자의 동선(Circulation) 흐름을 최적화하고 감각적인 빛과 마감재 스케듈링을 설계하며, 
+                      최근에는 생성형 AI 및 첨단 3D 워크플로우를 도입하여 콘셉트 기획 단계의 완성도와 개발 속도를 극대화하고 있습니다.
+                    </p>
+                  </div>
+
+                  <div>
+                    <h4 className="text-[10px] text-sky-400 font-bold uppercase tracking-wider mb-2 border-b border-zinc-900 pb-1 flex items-center gap-1.5">
+                      <Settings className="w-3.5 h-3.5 text-sky-400" />
+                      <span>Technical Competency</span>
+                    </h4>
+                    <div className="grid grid-cols-2 gap-x-4 gap-y-1.5 text-[10px]">
+                      <div className="flex justify-between border-b border-zinc-900/40 py-1">
+                        <span className="text-zinc-400">Concept Planning</span>
+                        <span className="text-sky-400">EXPERT</span>
+                      </div>
+                      <div className="flex justify-between border-b border-zinc-900/40 py-1">
+                        <span className="text-zinc-400">AutoCAD Drafting</span>
+                        <span className="text-sky-400">PROFICIENT</span>
+                      </div>
+                      <div className="flex justify-between border-b border-zinc-900/40 py-1">
+                        <span className="text-zinc-400">SketchUp 3D</span>
+                        <span className="text-sky-400">EXPERT</span>
+                      </div>
+                      <div className="flex justify-between border-b border-zinc-900/40 py-1">
+                        <span className="text-zinc-400">Enscape Render</span>
+                        <span className="text-sky-400">EXPERT</span>
+                      </div>
+                      <div className="flex justify-between border-b border-zinc-900/40 py-1">
+                        <span className="text-zinc-400">AI Midjourney Workflow</span>
+                        <span className="text-sky-400">PROFICIENT</span>
+                      </div>
+                      <div className="flex justify-between border-b border-zinc-900/40 py-1">
+                        <span className="text-zinc-400">Creative Direction</span>
+                        <span className="text-sky-400">EXPERT</span>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div>
+                    <h4 className="text-[10px] text-sky-400 font-bold uppercase tracking-wider mb-2 border-b border-zinc-900 pb-1 flex items-center gap-1.5">
+                      <GraduationCap className="w-3.5 h-3.5 text-sky-400" />
+                      <span>Education & Career Focus</span>
+                    </h4>
+                    <div className="space-y-2 text-[10px]">
+                      <div>
+                        <div className="flex justify-between text-zinc-200">
+                          <span className="font-bold">SPACE DESIGN MASTERCLASS ACADEMY</span>
+                          <span className="text-zinc-500 font-mono">2024 - 2025</span>
+                        </div>
+                        <p className="text-zinc-500 font-sans mt-0.5">전시 공간 디자인, 유기적 동선 수립 및 실시 설계 도면화 수료</p>
+                      </div>
+                      <div>
+                        <div className="flex justify-between text-zinc-200">
+                          <span className="font-bold">FINE ARTS & EXHIBITION PLANNING BACHELOR</span>
+                          <span className="text-zinc-500 font-mono">2018 - 2023</span>
+                        </div>
+                        <p className="text-zinc-500 font-sans mt-0.5">스토리텔링 기반 전시 레이아웃 시나리오 및 시각 커뮤니케이션 복수전공</p>
+                      </div>
+                    </div>
+                  </div>
+
+                </div>
+
+              </div>
+            </div>
+
+            {/* Footer */}
+            <div className="bg-[#0b0f15] px-6 py-4 border-t border-zinc-900 flex justify-end gap-3">
+              <button
+                onClick={() => {
+                  setShowAboutModal(false);
+                  setShowContactModal(true);
+                }}
+                className="bg-sky-500/10 hover:bg-sky-500/20 border border-sky-400/30 text-sky-300 px-4 py-2 rounded text-[11px] font-bold tracking-widest transition-all"
+              >
+                REQUEST CONTACT
+              </button>
+              <button
+                onClick={() => setShowAboutModal(false)}
+                className="bg-zinc-900 hover:bg-zinc-800 border border-zinc-800 text-zinc-400 px-4 py-2 rounded text-[11px] font-bold tracking-widest transition-all"
+              >
+                CLOSE
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* CONTACT MODAL */}
+      {showContactModal && (
+        <div className="fixed inset-0 bg-[#06080b]/95 backdrop-blur-md z-50 flex items-center justify-center p-4">
+          <div className="bg-[#090c10] border border-sky-500/20 max-w-md w-full rounded-lg shadow-2xl overflow-hidden font-mono text-zinc-300">
+            {/* Header */}
+            <div className="bg-[#0b0f15] px-4 py-3 border-b border-zinc-900 flex items-center justify-between">
+              <div className="flex items-center gap-2">
+                <span className="w-2.5 h-2.5 bg-sky-500 animate-pulse rounded-full"></span>
+                <span className="text-[10px] font-bold uppercase tracking-wider text-sky-400">NETWORK_PORT_CONTACT_SOCKET.log</span>
+              </div>
+              <button 
+                onClick={() => setShowContactModal(false)}
+                className="text-zinc-500 hover:text-white transition-colors"
+              >
+                <X className="w-4 h-4" />
+              </button>
+            </div>
+
+            {/* Content */}
+            <div className="p-6 md:p-8 space-y-6">
+              <div className="text-center space-y-2">
+                <div className="w-12 h-12 bg-sky-950/20 border border-sky-500/30 rounded-full flex items-center justify-center mx-auto mb-2">
+                  <Mail className="w-5 h-5 text-sky-400" />
+                </div>
+                <h3 className="text-sm font-bold text-zinc-100 tracking-wider">SECURE CONTACT CHANNELS</h3>
+                <p className="text-[10px] text-zinc-500">Exhibition Space Design Team Applicant — Soyoung Kim</p>
+              </div>
+
+              <div className="space-y-3 bg-zinc-950/60 p-4 rounded border border-zinc-900 text-xs">
+                <div className="flex items-center justify-between border-b border-zinc-900/80 pb-2">
+                  <span className="text-zinc-500">EMAIL ADDR:</span>
+                  <a href="mailto:zssaya3600@gmail.com" className="text-sky-400 font-bold hover:underline">zssaya3600@gmail.com</a>
+                </div>
+                <div className="flex items-center justify-between border-b border-zinc-900/80 pb-2">
+                  <span className="text-zinc-500">PHONE LINE:</span>
+                  <span className="text-zinc-300 font-bold">+82 (010) 5421-XXXX</span>
+                </div>
+                <div className="flex items-center justify-between border-b border-zinc-900/80 pb-2">
+                  <span className="text-zinc-500">RESIDENCE:</span>
+                  <span className="text-zinc-300 font-bold">Seoul, South Korea</span>
+                </div>
+                <div className="flex items-center justify-between pb-1">
+                  <span className="text-zinc-500">APPLY DEPT:</span>
+                  <span className="text-sky-400 font-bold">EXHIBITION SPACE DESIGN TEAM</span>
+                </div>
+              </div>
+
+              <div className="text-center">
+                <button
+                  onClick={handleDownloadPDF}
+                  className="w-full bg-sky-500/10 hover:bg-sky-500/20 border border-sky-400/30 hover:border-sky-400 text-sky-300 py-2.5 rounded text-[11px] font-bold tracking-widest transition-all uppercase"
+                >
+                  DOWNLOAD PORTFOLIO PDF (24.5MB)
+                </button>
+              </div>
+            </div>
+
+            {/* Footer */}
+            <div className="bg-[#0b0f15] px-6 py-4 border-t border-zinc-900 flex justify-end">
+              <button
+                onClick={() => setShowContactModal(false)}
+                className="bg-zinc-900 hover:bg-zinc-800 border border-zinc-800 text-zinc-400 px-5 py-2 rounded text-[11px] font-bold tracking-widest transition-all"
+              >
+                CLOSE SOCKET
+              </button>
+            </div>
           </div>
         </div>
       )}
