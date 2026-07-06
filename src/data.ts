@@ -1,7 +1,7 @@
 import { Category, Project } from "./types";
 
 export const defaultCategories: Category[] = [
-  { id: "01", num: "01", title: "Featured Project ATLAS-1", description: "Urban Food Hub · Community Experience · Smart Farm System" },
+  { id: "01", num: "01", title: "Featured Project ATLAS-1", description: "Urban Food Hub · Community Experience · Smart Farm System", image: "/images/atlas_01.png" },
   { id: "02", num: "02", title: "Exhibition Research", description: "Museum · Media Art · Pop-up Store · Spatial Branding" },
   { id: "03", num: "03", title: "Commercial Interior", description: "Academy · Cafe · Retail · Education Space" },
   { id: "04", num: "04", title: "Residential Design", description: "House · Apartment · Lifestyle Space" },
@@ -27,7 +27,7 @@ export const defaultProjects: Project[] = [
     materialLighting: { materials: ["Steel", "Tempered Glass", "Concrete"], lighting: ["4000K Line LED"], description: "구조미를 살린 산업용 금속 프레임과 매립 조명" },
     renderingUrl: "atlas_01_rendering",
     finalImageUrl: "atlas_01_final",
-    images: ["https://images.unsplash.com/photo-1530836369250-ef72a3f5cda8?q=80&w=1200&auto=format&fit=crop", "https://images.unsplash.com/photo-1466692476868-aef1dfb1e735?q=80&w=1200&auto=format&fit=crop"],
+    images: ["/images/atlas_01.png", "https://images.unsplash.com/photo-1466692476868-aef1dfb1e735?q=80&w=1200&auto=format&fit=crop"],
     panoramaUrl: "https://kuula.co/share/collection/7K7Pz",
     videoUrl: "https://www.youtube.com/watch?v=dQw4w9WgXcQ",
     archiveUrl: "https://github.com/",

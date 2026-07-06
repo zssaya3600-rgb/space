@@ -265,7 +265,6 @@ export default function App() {
   const [pathInputWarning, setPathInputWarning] = useState<string | null>(null);
   const [manualPathInput, setManualPathInput] = useState("");
   const [formSelectedImageIndex, setFormSelectedImageIndex] = useState<number | null>(null);
-  const [syncStatus, setSyncStatus] = useState<"idle" | "syncing" | "success" | "error">("idle");
 
   useEffect(() => {
     const val = manualPathInput.trim();
@@ -366,26 +365,6 @@ export default function App() {
   useEffect(() => {
     setActiveImageIndex(0);
   }, [selectedProject]);
-
-  // Auto-sync client local storage back to the agent container (so we can grab the user's browser-only edits)
-  useEffect(() => {
-    const syncData = () => {
-      try {
-        const cats = localStorage.getItem("workspace_categories");
-        const projs = localStorage.getItem("workspace_projects");
-        if (cats && projs) {
-          fetch("/api/save-localstorage", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ categories: JSON.parse(cats), projects: JSON.parse(projs) }),
-          }).catch(e => console.error("Sync back error", e));
-        }
-      } catch (err) {
-        console.error("Local storage sync parsing error", err);
-      }
-    };
-    syncData();
-  }, [categories, projects]);
 
   // Sync to localStorage
   const saveAllData = (updatedCategories: Category[], updatedProjects: Project[]) => {
@@ -967,35 +946,6 @@ export default function App() {
     }
   };
 
-  const handleSyncToServer = async () => {
-    setSyncStatus("syncing");
-    try {
-      const cats = localStorage.getItem("workspace_categories");
-      const projs = localStorage.getItem("workspace_projects");
-      if (!cats || !projs) {
-        setSyncStatus("error");
-        triggerNotification("SYNC FAILED: NO LOCAL DATA TO SEND.");
-        return;
-      }
-      const res = await fetch("/api/save-localstorage", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ categories: JSON.parse(cats), projects: JSON.parse(projs) }),
-      });
-      if (res.ok) {
-        setSyncStatus("success");
-        triggerNotification("DATABASE SAVED TO CONTAINER CODE! (Bake Ready)");
-      } else {
-        setSyncStatus("error");
-        triggerNotification("SYNC FAIL: SERVER RESPONSE NOT OK.");
-      }
-    } catch (e) {
-      console.error(e);
-      setSyncStatus("error");
-      triggerNotification("SYNC CONNECTION FAILED.");
-    }
-  };
-
   // Filter projects for selected category
   const activeCategoryProjects = selectedCategory 
     ? projects.filter(p => p.categoryId === selectedCategory.id) 
@@ -1231,35 +1181,8 @@ export default function App() {
                 <span className="font-mono text-xs text-zinc-400 font-semibold tracking-wider">ROOT_DIRECTORY / ARCHIVE_CATEGORIES</span>
               </div>
               
-              {/* Optional Reset/Clear custom changes for demo purposes (Admin Only) */}
-              {isAdmin && (
-                <div className="flex items-center gap-2">
-                  <button 
-                    onClick={handleSyncToServer}
-                    className={`text-[9px] font-mono transition-all font-bold ${
-                      syncStatus === "syncing"
-                        ? "text-amber-400 animate-pulse"
-                        : syncStatus === "success"
-                        ? "text-emerald-400"
-                        : "text-sky-400 hover:text-sky-300 underline"
-                    }`}
-                    title="현재 화면에서 수정한 모든 내용을 소스 코드 기본값으로 영구 저장합니다!"
-                  >
-                    {syncStatus === "idle" && "💾 수정한 데이터 코드에 반영하기"}
-                    {syncStatus === "syncing" && "⏳ 저장 중..."}
-                    {syncStatus === "success" && "✅ 저장 완료! (개발자 파일 생성됨)"}
-                    {syncStatus === "error" && "❌ 저장 실패 (재시도)"}
-                  </button>
-                  <span className="text-zinc-800">|</span>
-                  <button 
-                    onClick={handleResetDefaults}
-                    className="text-[9px] font-mono text-zinc-500 hover:text-sky-400 transition-colors underline"
-                    title="Reset modified mock values to default"
-                  >
-                    Factory Reset
-                  </button>
-                </div>
-              )}
+              {/* Space layout line */}
+              <div className="h-1"></div>
             </div>
 
             {/* Folder Grid - Elegant Architectural Folder Cards with Mini Blueprints */}
@@ -1317,92 +1240,22 @@ export default function App() {
                         } else {
                           setSelectedProject(null);
                         }
-                        if (isAdmin) {
-                          document.getElementById(`file-upload-${cat.id}`)?.click();
-                        }
                       }}
-                      className={`w-full h-24 rounded-lg overflow-hidden flex items-center justify-center mt-3 mb-3 relative transition-all duration-300 ${
-                        isAdmin 
-                          ? "bg-[#040608] hover:bg-[#070b11] border border-zinc-950 hover:border-sky-500/40 cursor-pointer group/upload" 
-                          : "bg-[#040608]/65 border border-zinc-900/60 cursor-default"
-                      } ${cat.image ? "p-0" : "p-2"}`}
+                      className="w-full h-24 rounded-lg overflow-hidden flex items-center justify-center mt-3 mb-3 relative transition-all duration-300 bg-[#040608]/65 border border-zinc-900/60 cursor-pointer"
                     >
-                      {/* Hidden File Input */}
-                      {isAdmin && (
-                        <input
-                          type="file"
-                          id={`file-upload-${cat.id}`}
-                          accept="image/png, image/jpeg, image/jpg, image/webp"
-                          className="hidden"
-                          onChange={(e) => handleCategoryIconUpload(cat.id, e)}
-                        />
-                      )}
-
                       {cat.image ? (
-                        <div className="relative w-full h-full flex items-center justify-center overflow-hidden">
-                          {failedImages[cat.image] ? (
-                            cat.image.startsWith("/images/") ? (
-                              <div className="w-full h-full flex flex-col items-center justify-center bg-[#070b11] text-zinc-400 text-[8px] leading-tight text-center p-1.5 font-mono" title="배포 후 public/images 폴더에서 확인됩니다.">
-                                <span className="truncate max-w-full text-sky-400/80 font-mono text-[7px] mb-0.5">{cat.image}</span>
-                                <span className="text-[6.5px] text-zinc-500 uppercase tracking-widest font-sans font-medium">배포 후 확인 가능</span>
-                              </div>
-                            ) : (
-                              <div className="w-full h-full flex flex-col items-center justify-center bg-[#050709] border border-zinc-900/40 text-zinc-500 select-none">
-                                <div className="text-[10px] font-mono tracking-[0.2em] font-medium uppercase text-zinc-600">
-                                  IMAGE PREPARING
-                                </div>
-                              </div>
-                            )
-                          ) : (
-                            <img 
-                              src={resolveImageSrc(cat.image)} 
-                              alt={cat.title} 
-                              className="w-full h-full object-cover object-center select-none"
-                              referrerPolicy="no-referrer"
-                              onError={() => handleImageError(cat.image)}
-                              onLoad={() => handleImageLoad(cat.image)}
-                            />
-                          )}
-                          {/* Hover change overlay indicator (Admin Only) */}
-                          {isAdmin && (
-                            <div className="absolute inset-0 bg-black/60 opacity-0 group-hover/upload:opacity-100 flex items-center justify-center transition-opacity duration-200">
-                              <span className="text-[8px] font-mono text-sky-400 font-bold uppercase tracking-widest">
-                                CHANGE IMAGE
-                              </span>
-                            </div>
-                          )}
-                          
-                          {/* Delete button (Admin Only) */}
-                          {isAdmin && (
-                            <button
-                              type="button"
-                              onClick={(e) => handleCategoryIconDelete(cat.id, e)}
-                              className="absolute top-1.5 right-1.5 p-1 bg-rose-950/80 hover:bg-rose-900 border border-rose-500/30 hover:border-rose-500 text-rose-300 hover:text-white rounded transition-all z-10"
-                              title="이미지 삭제"
-                            >
-                              <X className="w-3.5 h-3.5" />
-                            </button>
-                          )}
-                        </div>
+                        <img 
+                          src={cat.image} 
+                          alt={cat.title} 
+                          className="w-full h-full object-cover select-none"
+                          referrerPolicy="no-referrer"
+                        />
                       ) : (
-                        isAdmin ? (
-                          <div className="flex flex-col items-center justify-center gap-1.5 text-zinc-500 group-hover/upload:text-sky-400 transition-colors p-2 text-center select-none">
-                            <Upload className="w-4 h-4 text-zinc-600 group-hover/upload:text-sky-400/80 transition-colors animate-pulse" />
-                            <span className="text-[9px] font-mono tracking-wider font-bold uppercase">
-                              Click to upload project image
-                            </span>
-                          </div>
-                        ) : (
-                          <div className="w-full h-full flex flex-col items-center justify-center bg-[#050709] border border-zinc-900/40 text-zinc-500 select-none">
-                            <div className="text-[10px] font-mono tracking-[0.2em] font-medium uppercase text-zinc-600">
-                              IMAGE PREPARING
-                            </div>
-                          </div>
-                        )
+                        renderCategoryThumbnail(cat.id)
                       )}
 
                       {/* Coordinate Overlay */}
-                      <div className="absolute bottom-1 right-2 text-[6px] font-mono text-zinc-600 group-hover/upload:text-sky-500/40 transition-colors pointer-events-none">
+                      <div className="absolute bottom-1 right-2 text-[6px] font-mono text-zinc-600 pointer-events-none">
                         XYZ: 100.{cat.id} / 60.00
                       </div>
                     </div>
@@ -1946,93 +1799,9 @@ export default function App() {
                               )}
                             </>
                           ) : (
-                            isAdmin ? (
-                              <div className="w-full aspect-[16/9] bg-zinc-950/40 border border-dashed border-zinc-850 rounded-lg flex flex-col items-center justify-center p-6 text-center">
-                                <Upload className="w-8 h-8 text-zinc-650 mb-2 animate-pulse" />
-                                <p className="text-xs text-zinc-400 font-sans">등록된 포트폴리오 이미지가 없습니다.</p>
-                                <p className="text-[10px] text-zinc-500 mt-1 font-sans">아래 업로드 구역에서 컴퓨터의 이미지를 드래그하거나 선택하여 첫 이미지를 추가하세요.</p>
-                              </div>
-                            ) : (
-                              <div className="w-full aspect-[16/9] bg-[#050709] border border-zinc-900 rounded-lg flex flex-col items-center justify-center p-6 text-center select-none">
-                                <div className="text-[11px] font-mono tracking-[0.2em] font-medium uppercase text-zinc-600">
-                                  IMAGE PREPARING
-                                </div>
-                              </div>
-                            )
-                          )}
-
-                          {/* Direct Drag & Drop / Click Upload Area (Admin Only) */}
-                          {isAdmin && (
-                            <div 
-                              onDragOver={(e) => {
-                                e.preventDefault();
-                                setIsDetailDragging(true);
-                              }}
-                              onDragLeave={() => setIsDetailDragging(false)}
-                              onDrop={(e) => {
-                                e.preventDefault();
-                                setIsDetailDragging(false);
-                                if (e.dataTransfer.files) {
-                                  handleDirectImageUpload(e.dataTransfer.files);
-                                }
-                              }}
-                              className={`p-4 rounded-lg border border-dashed transition-all ${
-                                isDetailDragging 
-                                  ? "border-sky-400 bg-sky-950/25" 
-                                  : "border-sky-950/40 bg-[#090c10]/40 hover:bg-[#0c1015]/40"
-                              }`}
-                            >
-                              <div className="space-y-3">
-                                {/* Filename guide / manual warning */}
-                                <p className="text-[10px] text-zinc-400 leading-relaxed text-center sm:text-left font-sans">
-                                  * <span className="text-sky-400 font-bold">안내:</span> 이미지 파일명에 한글, 공백, 특수문자, 괄호가 포함된 경우 자동으로 안전하게 변환됩니다. 가능하면 <span className="text-sky-400 font-bold underline">영문 소문자, 숫자, 언더바(_)</span>만 사용해주세요.
-                                </p>
-
-                                {uploadError && (
-                                  <div className="p-2.5 bg-rose-950/20 border border-rose-500/30 rounded text-rose-300 text-xs font-mono flex items-center gap-2">
-                                    <AlertCircle className="w-4 h-4 text-rose-400 shrink-0" />
-                                    <span>{uploadError}</span>
-                                    <button 
-                                      type="button" 
-                                      onClick={() => setUploadError(null)} 
-                                      className="ml-auto text-zinc-500 hover:text-zinc-300 font-sans"
-                                    >
-                                      ✕
-                                    </button>
-                                  </div>
-                                )}
-
-                                <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
-                                  <div className="space-y-1 text-center sm:text-left">
-                                    <div className="flex items-center justify-center sm:justify-start gap-1.5 text-[11px] text-zinc-300 font-bold">
-                                      <Upload className="w-4 h-4 text-sky-400" />
-                                      <span>내 컴퓨터 이미지 다중 첨부 (Drag & Drop)</span>
-                                    </div>
-                                    <p className="text-[10px] text-zinc-500 font-sans">
-                                      이미지 파일들을 여기로 드래그하거나 컴퓨터에서 선택하세요. (JPEG, PNG 등 다중 선택 가능)
-                                    </p>
-                                  </div>
-                                  <button
-                                    type="button"
-                                    onClick={() => document.getElementById("direct-detail-upload")?.click()}
-                                    className="w-full sm:w-auto px-4 py-1.5 rounded bg-[#0e1724] hover:bg-[#132236] border border-sky-500/30 text-sky-300 text-xs font-bold transition-all whitespace-nowrap shrink-0 flex items-center justify-center gap-1.5 shadow-[0_0_12px_rgba(56,189,248,0.1)] hover:shadow-[0_0_15px_rgba(56,189,248,0.2)]"
-                                  >
-                                    <Plus className="w-3.5 h-3.5" />
-                                    <span>컴퓨터 파일 선택</span>
-                                  </button>
-                                  <input
-                                    type="file"
-                                    id="direct-detail-upload"
-                                    multiple
-                                    accept="image/*"
-                                    onChange={(e) => {
-                                      if (e.target.files) {
-                                        handleDirectImageUpload(e.target.files);
-                                      }
-                                    }}
-                                    className="hidden"
-                                  />
-                                </div>
+                            <div className="w-full aspect-[16/9] bg-[#050709] border border-zinc-900 rounded-lg flex flex-col items-center justify-center p-6 text-center select-none">
+                              <div className="text-[11px] font-mono tracking-[0.2em] font-medium uppercase text-zinc-600">
+                                IMAGE PREPARING
                               </div>
                             </div>
                           )}

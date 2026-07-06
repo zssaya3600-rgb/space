@@ -4,7 +4,8 @@
       "id": "01",
       "num": "01",
       "title": "Featured Project ATLAS-1",
-      "description": "Urban Food Hub · Community Experience · Smart Farm System"
+      "description": "Urban Food Hub · Community Experience · Smart Farm System",
+      "image": "/images/atlas_01.png"
     },
     {
       "id": "02",
@@ -96,7 +97,7 @@
       "renderingUrl": "atlas_01_rendering",
       "finalImageUrl": "atlas_01_final",
       "images": [
-        "https://images.unsplash.com/photo-1530836369250-ef72a3f5cda8?q=80&w=1200&auto=format&fit=crop",
+        "/images/atlas_01.png",
         "https://images.unsplash.com/photo-1466692476868-aef1dfb1e735?q=80&w=1200&auto=format&fit=crop"
       ],
       "panoramaUrl": "https://kuula.co/share/collection/7K7Pz",
