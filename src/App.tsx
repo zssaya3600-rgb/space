@@ -1087,7 +1087,11 @@ export default function App() {
       {/* FIXED TOP MENU BAR - Refined Professional Portfolio Header */}
       <header className="w-full min-h-12 border-b border-zinc-900 bg-[#07090c]/90 backdrop-blur-md px-4 py-2 flex flex-col md:flex-row items-center justify-between text-xs font-mono tracking-wider z-40 select-none gap-3 md:gap-0">
         <div className="flex items-center justify-between w-full md:w-auto gap-4">
-          <div className="flex items-center gap-2.5 text-sky-400 font-bold font-sans tracking-wide">
+          <div 
+            onDoubleClick={() => setShowAdminModal(true)}
+            className="flex items-center gap-2.5 text-sky-400 font-bold font-sans tracking-wide cursor-default select-none"
+            title="Soyoung Kim Space Design Portfolio"
+          >
             <span className="w-2 h-2 rounded-full bg-sky-400 animate-pulse"></span>
             <span className="text-[11px] uppercase text-zinc-200 tracking-[0.18em]">SOYOUNG KIM <span className="text-sky-500/80 mx-0.5">·</span> SPACE DESIGN PORTFOLIO</span>
           </div>
@@ -1121,14 +1125,16 @@ export default function App() {
               </button>
             </div>
           ) : (
-            <button 
-              onClick={() => setShowAdminModal(true)}
-              className="flex items-center gap-1 bg-zinc-950/80 hover:bg-sky-950/20 border border-zinc-900 hover:border-sky-500/20 px-2 py-0.5 rounded text-zinc-500 hover:text-sky-400 transition-all text-[9px]"
-              title="Console login"
-            >
-              <Settings className="w-2.5 h-2.5 text-zinc-600 group-hover:text-sky-400" />
-              <span>CONSOLE</span>
-            </button>
+            (typeof window !== "undefined" && window.location.search.includes("admin")) && (
+              <button 
+                onClick={() => setShowAdminModal(true)}
+                className="flex items-center gap-1 bg-zinc-950/80 hover:bg-sky-950/20 border border-zinc-900 hover:border-sky-500/20 px-2 py-0.5 rounded text-zinc-500 hover:text-sky-400 transition-all text-[9px]"
+                title="Console login"
+              >
+                <Settings className="w-2.5 h-2.5 text-zinc-600 group-hover:text-sky-400" />
+                <span>CONSOLE</span>
+              </button>
+            )
           )}
 
           {/* Clock */}
@@ -1225,33 +1231,35 @@ export default function App() {
                 <span className="font-mono text-xs text-zinc-400 font-semibold tracking-wider">ROOT_DIRECTORY / ARCHIVE_CATEGORIES</span>
               </div>
               
-              {/* Optional Reset/Clear custom changes for demo purposes */}
-              <div className="flex items-center gap-2">
-                <button 
-                  onClick={handleSyncToServer}
-                  className={`text-[9px] font-mono transition-all font-bold ${
-                    syncStatus === "syncing"
-                      ? "text-amber-400 animate-pulse"
-                      : syncStatus === "success"
-                      ? "text-emerald-400"
-                      : "text-sky-400 hover:text-sky-300 underline"
-                  }`}
-                  title="현재 화면에서 수정한 모든 내용을 소스 코드 기본값으로 영구 저장합니다!"
-                >
-                  {syncStatus === "idle" && "💾 수정한 데이터 코드에 반영하기"}
-                  {syncStatus === "syncing" && "⏳ 저장 중..."}
-                  {syncStatus === "success" && "✅ 저장 완료! (개발자 파일 생성됨)"}
-                  {syncStatus === "error" && "❌ 저장 실패 (재시도)"}
-                </button>
-                <span className="text-zinc-800">|</span>
-                <button 
-                  onClick={handleResetDefaults}
-                  className="text-[9px] font-mono text-zinc-500 hover:text-sky-400 transition-colors underline"
-                  title="Reset modified mock values to default"
-                >
-                  Factory Reset
-                </button>
-              </div>
+              {/* Optional Reset/Clear custom changes for demo purposes (Admin Only) */}
+              {isAdmin && (
+                <div className="flex items-center gap-2">
+                  <button 
+                    onClick={handleSyncToServer}
+                    className={`text-[9px] font-mono transition-all font-bold ${
+                      syncStatus === "syncing"
+                        ? "text-amber-400 animate-pulse"
+                        : syncStatus === "success"
+                        ? "text-emerald-400"
+                        : "text-sky-400 hover:text-sky-300 underline"
+                    }`}
+                    title="현재 화면에서 수정한 모든 내용을 소스 코드 기본값으로 영구 저장합니다!"
+                  >
+                    {syncStatus === "idle" && "💾 수정한 데이터 코드에 반영하기"}
+                    {syncStatus === "syncing" && "⏳ 저장 중..."}
+                    {syncStatus === "success" && "✅ 저장 완료! (개발자 파일 생성됨)"}
+                    {syncStatus === "error" && "❌ 저장 실패 (재시도)"}
+                  </button>
+                  <span className="text-zinc-800">|</span>
+                  <button 
+                    onClick={handleResetDefaults}
+                    className="text-[9px] font-mono text-zinc-500 hover:text-sky-400 transition-colors underline"
+                    title="Reset modified mock values to default"
+                  >
+                    Factory Reset
+                  </button>
+                </div>
+              )}
             </div>
 
             {/* Folder Grid - Elegant Architectural Folder Cards with Mini Blueprints */}
@@ -1298,7 +1306,7 @@ export default function App() {
                       </span>
                     </div>
 
-                    {/* Architectural Vector Thumbnail Box / Upload Box */}
+                    {/* Architectural Vector Thumbnail Box */}
                     <div 
                       onClick={(e) => {
                         e.stopPropagation(); // Prevent scroll jump!
@@ -1309,20 +1317,26 @@ export default function App() {
                         } else {
                           setSelectedProject(null);
                         }
-                        document.getElementById(`file-upload-${cat.id}`)?.click();
+                        if (isAdmin) {
+                          document.getElementById(`file-upload-${cat.id}`)?.click();
+                        }
                       }}
-                      className={`w-full h-24 bg-[#040608] hover:bg-[#070b11] border border-zinc-950 hover:border-sky-500/40 rounded-lg overflow-hidden flex items-center justify-center mt-3 mb-3 relative transition-all duration-300 cursor-pointer group/upload ${
-                        cat.image ? "p-0" : "p-2"
-                      }`}
+                      className={`w-full h-24 rounded-lg overflow-hidden flex items-center justify-center mt-3 mb-3 relative transition-all duration-300 ${
+                        isAdmin 
+                          ? "bg-[#040608] hover:bg-[#070b11] border border-zinc-950 hover:border-sky-500/40 cursor-pointer group/upload" 
+                          : "bg-[#040608]/65 border border-zinc-900/60 cursor-default"
+                      } ${cat.image ? "p-0" : "p-2"}`}
                     >
                       {/* Hidden File Input */}
-                      <input
-                        type="file"
-                        id={`file-upload-${cat.id}`}
-                        accept="image/png, image/jpeg, image/jpg, image/webp"
-                        className="hidden"
-                        onChange={(e) => handleCategoryIconUpload(cat.id, e)}
-                      />
+                      {isAdmin && (
+                        <input
+                          type="file"
+                          id={`file-upload-${cat.id}`}
+                          accept="image/png, image/jpeg, image/jpg, image/webp"
+                          className="hidden"
+                          onChange={(e) => handleCategoryIconUpload(cat.id, e)}
+                        />
+                      )}
 
                       {cat.image ? (
                         <div className="relative w-full h-full flex items-center justify-center overflow-hidden">
@@ -1333,9 +1347,10 @@ export default function App() {
                                 <span className="text-[6.5px] text-zinc-500 uppercase tracking-widest font-sans font-medium">배포 후 확인 가능</span>
                               </div>
                             ) : (
-                              <div className="w-full h-full flex flex-col items-center justify-center bg-rose-950/30 border border-rose-500/30 text-rose-300 text-[8px] leading-tight text-center p-1 font-mono" title="이미지를 찾을 수 없습니다.">
-                                <AlertCircle className="w-4 h-4 text-rose-400 mb-0.5" />
-                                <span className="truncate max-w-full text-[8px]">ERR</span>
+                              <div className="w-full h-full flex flex-col items-center justify-center bg-[#050709] border border-zinc-900/40 text-zinc-500 select-none">
+                                <div className="text-[10px] font-mono tracking-[0.2em] font-medium uppercase text-zinc-600">
+                                  IMAGE PREPARING
+                                </div>
                               </div>
                             )
                           ) : (
@@ -1348,30 +1363,42 @@ export default function App() {
                               onLoad={() => handleImageLoad(cat.image)}
                             />
                           )}
-                          {/* Hover change overlay indicator */}
-                          <div className="absolute inset-0 bg-black/60 opacity-0 group-hover/upload:opacity-100 flex items-center justify-center transition-opacity duration-200">
-                            <span className="text-[8px] font-mono text-sky-400 font-bold uppercase tracking-widest">
-                              CHANGE IMAGE
-                            </span>
-                          </div>
+                          {/* Hover change overlay indicator (Admin Only) */}
+                          {isAdmin && (
+                            <div className="absolute inset-0 bg-black/60 opacity-0 group-hover/upload:opacity-100 flex items-center justify-center transition-opacity duration-200">
+                              <span className="text-[8px] font-mono text-sky-400 font-bold uppercase tracking-widest">
+                                CHANGE IMAGE
+                              </span>
+                            </div>
+                          )}
                           
-                          {/* Delete button */}
-                          <button
-                            type="button"
-                            onClick={(e) => handleCategoryIconDelete(cat.id, e)}
-                            className="absolute top-1.5 right-1.5 p-1 bg-rose-950/80 hover:bg-rose-900 border border-rose-500/30 hover:border-rose-500 text-rose-300 hover:text-white rounded transition-all z-10"
-                            title="이미지 삭제"
-                          >
-                            <X className="w-3.5 h-3.5" />
-                          </button>
+                          {/* Delete button (Admin Only) */}
+                          {isAdmin && (
+                            <button
+                              type="button"
+                              onClick={(e) => handleCategoryIconDelete(cat.id, e)}
+                              className="absolute top-1.5 right-1.5 p-1 bg-rose-950/80 hover:bg-rose-900 border border-rose-500/30 hover:border-rose-500 text-rose-300 hover:text-white rounded transition-all z-10"
+                              title="이미지 삭제"
+                            >
+                              <X className="w-3.5 h-3.5" />
+                            </button>
+                          )}
                         </div>
                       ) : (
-                        <div className="flex flex-col items-center justify-center gap-1.5 text-zinc-500 group-hover/upload:text-sky-400 transition-colors p-2 text-center select-none">
-                          <Upload className="w-4 h-4 text-zinc-600 group-hover/upload:text-sky-400/80 transition-colors animate-pulse" />
-                          <span className="text-[9px] font-mono tracking-wider font-bold uppercase">
-                            Click to upload project image
-                          </span>
-                        </div>
+                        isAdmin ? (
+                          <div className="flex flex-col items-center justify-center gap-1.5 text-zinc-500 group-hover/upload:text-sky-400 transition-colors p-2 text-center select-none">
+                            <Upload className="w-4 h-4 text-zinc-600 group-hover/upload:text-sky-400/80 transition-colors animate-pulse" />
+                            <span className="text-[9px] font-mono tracking-wider font-bold uppercase">
+                              Click to upload project image
+                            </span>
+                          </div>
+                        ) : (
+                          <div className="w-full h-full flex flex-col items-center justify-center bg-[#050709] border border-zinc-900/40 text-zinc-500 select-none">
+                            <div className="text-[10px] font-mono tracking-[0.2em] font-medium uppercase text-zinc-600">
+                              IMAGE PREPARING
+                            </div>
+                          </div>
+                        )
                       )}
 
                       {/* Coordinate Overlay */}
@@ -1796,18 +1823,20 @@ export default function App() {
                                   SYS_RENDER_VIEWPORT [ACTIVE]
                                 </div>
 
-                                <button
-                                  type="button"
-                                  onClick={(e) => {
-                                    e.stopPropagation();
-                                    handleDirectImageDelete(activeImageIndex);
-                                  }}
-                                  className="absolute top-2 right-2 p-1.5 rounded bg-rose-950/80 hover:bg-rose-900 border border-rose-500/40 text-rose-300 hover:text-rose-100 transition-all text-[8px] font-mono flex items-center gap-1 z-10"
-                                  title="현재 이미지 삭제"
-                                >
-                                  <Trash2 className="w-3 h-3" />
-                                  <span className="hidden sm:inline">DELETE</span>
-                                </button>
+                                {isAdmin && (
+                                  <button
+                                    type="button"
+                                    onClick={(e) => {
+                                      e.stopPropagation();
+                                      handleDirectImageDelete(activeImageIndex);
+                                    }}
+                                    className="absolute top-2 right-2 p-1.5 rounded bg-rose-950/80 hover:bg-rose-900 border border-rose-500/40 text-rose-300 hover:text-rose-100 transition-all text-[8px] font-mono flex items-center gap-1 z-10"
+                                    title="현재 이미지 삭제"
+                                  >
+                                    <Trash2 className="w-3 h-3" />
+                                    <span className="hidden sm:inline">DELETE</span>
+                                  </button>
+                                )}
 
                                 <div className="absolute bottom-2 right-2 pointer-events-none bg-black/70 border border-zinc-800 px-2 py-0.5 rounded text-[8px] text-zinc-500">
                                   REF: {activeImageIndex + 1} / {uploadedImages.length}
@@ -1838,30 +1867,9 @@ export default function App() {
                                       </div>
                                     </div>
                                   ) : (
-                                    <div className="w-full h-full flex flex-col items-center justify-center p-6 bg-rose-950/20 text-center font-mono select-none border border-rose-500/30 rounded">
-                                      <AlertCircle className="w-8 h-8 text-rose-500 mb-2 animate-pulse" />
-                                      <p className="text-xs text-rose-300 font-bold">이미지를 찾을 수 없습니다.</p>
-                                      <p className="text-[10px] text-zinc-400 mt-1 max-w-[85%] leading-relaxed">
-                                        이미지 URL 또는 /images/파일명.png 경로를 확인해주세요.
-                                      </p>
-                                      
-                                      <div className="mt-3.5 text-[9.5px] text-zinc-500 space-y-1 text-left bg-black/50 p-2.5 rounded border border-zinc-900/60 font-sans max-w-[85%]">
-                                        <p className="truncate"><span className="text-rose-400 font-bold">•</span> 외부 URL 예시: <span className="text-zinc-400 font-mono text-[9px]">https://example.com/atlas_main_01.png</span></p>
-                                        <p className="truncate"><span className="text-sky-400 font-bold">•</span> 내부 경로 예시: <span className="text-zinc-400 font-mono text-[9px]">/images/atlas_main_01.png</span></p>
-                                      </div>
-
-                                      <div className="mt-4 bg-zinc-950/90 border border-zinc-800 rounded px-2.5 py-1.5 flex items-center gap-2 max-w-[90%] overflow-hidden">
-                                        <span className="text-[9px] text-zinc-500 truncate select-all">{uploadedImages[activeImageIndex]}</span>
-                                        <button
-                                          type="button"
-                                          onClick={() => {
-                                            navigator.clipboard.writeText(uploadedImages[activeImageIndex]);
-                                            triggerNotification("IMAGE PATH COPIED.");
-                                          }}
-                                          className="px-1.5 py-0.5 rounded bg-zinc-900 hover:bg-zinc-850 border border-zinc-800 text-zinc-400 hover:text-white transition-all text-[8px] shrink-0"
-                                        >
-                                          COPY PATH
-                                        </button>
+                                    <div className="w-full h-full flex flex-col items-center justify-center p-6 bg-[#050709] border border-zinc-900 text-center font-mono select-none">
+                                      <div className="text-[11px] font-mono tracking-[0.22em] font-medium text-zinc-600 uppercase animate-pulse">
+                                        IMAGE PREPARING
                                       </div>
                                     </div>
                                   )
@@ -1938,86 +1946,96 @@ export default function App() {
                               )}
                             </>
                           ) : (
-                            <div className="w-full aspect-[16/9] bg-zinc-950/40 border border-dashed border-zinc-850 rounded-lg flex flex-col items-center justify-center p-6 text-center">
-                              <Upload className="w-8 h-8 text-zinc-650 mb-2 animate-pulse" />
-                              <p className="text-xs text-zinc-400 font-sans">등록된 포트폴리오 이미지가 없습니다.</p>
-                              <p className="text-[10px] text-zinc-500 mt-1 font-sans">아래 업로드 구역에서 컴퓨터의 이미지를 드래그하거나 선택하여 첫 이미지를 추가하세요.</p>
-                            </div>
+                            isAdmin ? (
+                              <div className="w-full aspect-[16/9] bg-zinc-950/40 border border-dashed border-zinc-850 rounded-lg flex flex-col items-center justify-center p-6 text-center">
+                                <Upload className="w-8 h-8 text-zinc-650 mb-2 animate-pulse" />
+                                <p className="text-xs text-zinc-400 font-sans">등록된 포트폴리오 이미지가 없습니다.</p>
+                                <p className="text-[10px] text-zinc-500 mt-1 font-sans">아래 업로드 구역에서 컴퓨터의 이미지를 드래그하거나 선택하여 첫 이미지를 추가하세요.</p>
+                              </div>
+                            ) : (
+                              <div className="w-full aspect-[16/9] bg-[#050709] border border-zinc-900 rounded-lg flex flex-col items-center justify-center p-6 text-center select-none">
+                                <div className="text-[11px] font-mono tracking-[0.2em] font-medium uppercase text-zinc-600">
+                                  IMAGE PREPARING
+                                </div>
+                              </div>
+                            )
                           )}
 
-                          {/* Direct Drag & Drop / Click Upload Area */}
-                          <div 
-                            onDragOver={(e) => {
-                              e.preventDefault();
-                              setIsDetailDragging(true);
-                            }}
-                            onDragLeave={() => setIsDetailDragging(false)}
-                            onDrop={(e) => {
-                              e.preventDefault();
-                              setIsDetailDragging(false);
-                              if (e.dataTransfer.files) {
-                                handleDirectImageUpload(e.dataTransfer.files);
-                              }
-                            }}
-                            className={`p-4 rounded-lg border border-dashed transition-all ${
-                              isDetailDragging 
-                                ? "border-sky-400 bg-sky-950/25" 
-                                : "border-sky-950/40 bg-[#090c10]/40 hover:bg-[#0c1015]/40"
-                            }`}
-                          >
-                            <div className="space-y-3">
-                              {/* Filename guide / manual warning */}
-                              <p className="text-[10px] text-zinc-400 leading-relaxed text-center sm:text-left font-sans">
-                                * <span className="text-sky-400 font-bold">안내:</span> 이미지 파일명에 한글, 공백, 특수문자, 괄호가 포함된 경우 자동으로 안전하게 변환됩니다. 가능하면 <span className="text-sky-400 font-bold underline">영문 소문자, 숫자, 언더바(_)</span>만 사용해주세요.
-                              </p>
+                          {/* Direct Drag & Drop / Click Upload Area (Admin Only) */}
+                          {isAdmin && (
+                            <div 
+                              onDragOver={(e) => {
+                                e.preventDefault();
+                                setIsDetailDragging(true);
+                              }}
+                              onDragLeave={() => setIsDetailDragging(false)}
+                              onDrop={(e) => {
+                                e.preventDefault();
+                                setIsDetailDragging(false);
+                                if (e.dataTransfer.files) {
+                                  handleDirectImageUpload(e.dataTransfer.files);
+                                }
+                              }}
+                              className={`p-4 rounded-lg border border-dashed transition-all ${
+                                isDetailDragging 
+                                  ? "border-sky-400 bg-sky-950/25" 
+                                  : "border-sky-950/40 bg-[#090c10]/40 hover:bg-[#0c1015]/40"
+                              }`}
+                            >
+                              <div className="space-y-3">
+                                {/* Filename guide / manual warning */}
+                                <p className="text-[10px] text-zinc-400 leading-relaxed text-center sm:text-left font-sans">
+                                  * <span className="text-sky-400 font-bold">안내:</span> 이미지 파일명에 한글, 공백, 특수문자, 괄호가 포함된 경우 자동으로 안전하게 변환됩니다. 가능하면 <span className="text-sky-400 font-bold underline">영문 소문자, 숫자, 언더바(_)</span>만 사용해주세요.
+                                </p>
 
-                              {uploadError && (
-                                <div className="p-2.5 bg-rose-950/20 border border-rose-500/30 rounded text-rose-300 text-xs font-mono flex items-center gap-2">
-                                  <AlertCircle className="w-4 h-4 text-rose-400 shrink-0" />
-                                  <span>{uploadError}</span>
-                                  <button 
-                                    type="button" 
-                                    onClick={() => setUploadError(null)} 
-                                    className="ml-auto text-zinc-500 hover:text-zinc-300 font-sans"
-                                  >
-                                    ✕
-                                  </button>
-                                </div>
-                              )}
-
-                              <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
-                                <div className="space-y-1 text-center sm:text-left">
-                                  <div className="flex items-center justify-center sm:justify-start gap-1.5 text-[11px] text-zinc-300 font-bold">
-                                    <Upload className="w-4 h-4 text-sky-400" />
-                                    <span>내 컴퓨터 이미지 다중 첨부 (Drag & Drop)</span>
+                                {uploadError && (
+                                  <div className="p-2.5 bg-rose-950/20 border border-rose-500/30 rounded text-rose-300 text-xs font-mono flex items-center gap-2">
+                                    <AlertCircle className="w-4 h-4 text-rose-400 shrink-0" />
+                                    <span>{uploadError}</span>
+                                    <button 
+                                      type="button" 
+                                      onClick={() => setUploadError(null)} 
+                                      className="ml-auto text-zinc-500 hover:text-zinc-300 font-sans"
+                                    >
+                                      ✕
+                                    </button>
                                   </div>
-                                  <p className="text-[10px] text-zinc-500 font-sans">
-                                    이미지 파일들을 여기로 드래그하거나 컴퓨터에서 선택하세요. (JPEG, PNG 등 다중 선택 가능)
-                                  </p>
+                                )}
+
+                                <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
+                                  <div className="space-y-1 text-center sm:text-left">
+                                    <div className="flex items-center justify-center sm:justify-start gap-1.5 text-[11px] text-zinc-300 font-bold">
+                                      <Upload className="w-4 h-4 text-sky-400" />
+                                      <span>내 컴퓨터 이미지 다중 첨부 (Drag & Drop)</span>
+                                    </div>
+                                    <p className="text-[10px] text-zinc-500 font-sans">
+                                      이미지 파일들을 여기로 드래그하거나 컴퓨터에서 선택하세요. (JPEG, PNG 등 다중 선택 가능)
+                                    </p>
+                                  </div>
+                                  <button
+                                    type="button"
+                                    onClick={() => document.getElementById("direct-detail-upload")?.click()}
+                                    className="w-full sm:w-auto px-4 py-1.5 rounded bg-[#0e1724] hover:bg-[#132236] border border-sky-500/30 text-sky-300 text-xs font-bold transition-all whitespace-nowrap shrink-0 flex items-center justify-center gap-1.5 shadow-[0_0_12px_rgba(56,189,248,0.1)] hover:shadow-[0_0_15px_rgba(56,189,248,0.2)]"
+                                  >
+                                    <Plus className="w-3.5 h-3.5" />
+                                    <span>컴퓨터 파일 선택</span>
+                                  </button>
+                                  <input
+                                    type="file"
+                                    id="direct-detail-upload"
+                                    multiple
+                                    accept="image/*"
+                                    onChange={(e) => {
+                                      if (e.target.files) {
+                                        handleDirectImageUpload(e.target.files);
+                                      }
+                                    }}
+                                    className="hidden"
+                                  />
                                 </div>
-                                <button
-                                  type="button"
-                                  onClick={() => document.getElementById("direct-detail-upload")?.click()}
-                                  className="w-full sm:w-auto px-4 py-1.5 rounded bg-[#0e1724] hover:bg-[#132236] border border-sky-500/30 text-sky-300 text-xs font-bold transition-all whitespace-nowrap shrink-0 flex items-center justify-center gap-1.5 shadow-[0_0_12px_rgba(56,189,248,0.1)] hover:shadow-[0_0_15px_rgba(56,189,248,0.2)]"
-                                >
-                                  <Plus className="w-3.5 h-3.5" />
-                                  <span>컴퓨터 파일 선택</span>
-                                </button>
-                                <input
-                                  type="file"
-                                  id="direct-detail-upload"
-                                  multiple
-                                  accept="image/*"
-                                  onChange={(e) => {
-                                    if (e.target.files) {
-                                      handleDirectImageUpload(e.target.files);
-                                    }
-                                  }}
-                                  className="hidden"
-                                />
                               </div>
                             </div>
-                          </div>
+                          )}
                         </div>
 
                         {/* Concept Block with Premium styling */}
