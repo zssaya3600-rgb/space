@@ -163,40 +163,9 @@ function renderCategoryThumbnail(catId: string) {
 }
 
 export default function App() {
-  // Application Data States (persisted in localStorage)
-  const [categories, setCategories] = useState<Category[]>(() => {
-    const saved = localStorage.getItem("workspace_categories");
-    if (saved) {
-      const parsed = JSON.parse(saved) as Category[];
-      // Reset if old structure is detected or the new "Exhibition Research" / "AI Workflow" category is missing
-      if (
-        !parsed.some(c => c.title === "Exhibition Research") ||
-        !parsed.some(c => c.title === "AI Workflow") ||
-        parsed.some(c => c.title === "Research & Concept")
-      ) {
-        localStorage.setItem("workspace_categories", JSON.stringify(defaultCategories));
-        return defaultCategories;
-      }
-      return parsed;
-    }
-    return defaultCategories;
-  });
-  const [projects, setProjects] = useState<Project[]>(() => {
-    const saved = localStorage.getItem("workspace_projects");
-    if (saved) {
-      const parsed = JSON.parse(saved) as Project[];
-      // Update cache if using old structure or missing the new "aiwf-01" project
-      if (
-        parsed.some(p => p.id === "ex-01" || p.id === "ex-02" || p.id === "in-01") ||
-        !parsed.some(p => p.id === "aiwf-01")
-      ) {
-        localStorage.setItem("workspace_projects", JSON.stringify(defaultProjects));
-        return defaultProjects;
-      }
-      return parsed;
-    }
-    return defaultProjects;
-  });
+  // Application Data States (constant default values as basis, no localStorage dependency)
+  const [categories, setCategories] = useState<Category[]>(defaultCategories);
+  const [projects, setProjects] = useState<Project[]>(defaultProjects);
 
   // Selected state
   const [selectedCategory, setSelectedCategory] = useState<Category | null>(null);
@@ -362,10 +331,15 @@ export default function App() {
   // Helper to resolve actual rendering src from path or URL
   const resolveImageSrc = (src: string): string => {
     if (!src) return "";
-    if (sessionPreviews[src]) {
-      return sessionPreviews[src];
+    const trimmed = src.trim();
+    if (sessionPreviews[trimmed]) {
+      return sessionPreviews[trimmed];
     }
-    return src;
+    // For Vercel / production environments path resolution:
+    if (trimmed.startsWith("images/")) {
+      return "/" + trimmed;
+    }
+    return trimmed;
   };
 
   // System notification
@@ -429,10 +403,9 @@ export default function App() {
     }
   };
 
-  // Sync to localStorage
+  // Sync to localStorage removed per requirements
   const saveAllData = (updatedCategories: Category[], updatedProjects: Project[]) => {
-    localStorage.setItem("workspace_categories", JSON.stringify(updatedCategories));
-    localStorage.setItem("workspace_projects", JSON.stringify(updatedProjects));
+    // No-op: localStorage dependency removed
   };
 
   const handleCategoryIconUpload = (catId: string, e: React.ChangeEvent<HTMLInputElement>) => {

@@ -193,7 +193,7 @@ export const defaultProjects: Project[] = [
     materialLighting: { materials: ["Acoustic Plasterboard"], lighting: ["Diffuse Ceiling Light"], description: "작품 집중에 방해 없는 균일한 무지향성 확산광" },
     renderingUrl: "exres_01_rendering",
     finalImageUrl: "exres_01_final",
-    images: ["https://images.unsplash.com/photo-1554907984-15263bfd63bd?q=80&w=1200&auto=format&fit=crop", "https://images.unsplash.com/photo-1491156855053-9cdff72c7f85?q=80&w=1200&auto=format&fit=crop"]
+    images: ["/images/project2.png", "https://images.unsplash.com/photo-1554907984-15263bfd63bd?q=80&w=1200&auto=format&fit=crop", "https://images.unsplash.com/photo-1491156855053-9cdff72c7f85?q=80&w=1200&auto=format&fit=crop"]
   },
   {
     id: "exres-02",

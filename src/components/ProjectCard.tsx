@@ -68,7 +68,7 @@ export const ProjectCard: React.FC<ProjectCardProps> = ({
           />
         ) : cat.image ? (
           <img
-            src={cat.image}
+            src={cat.image.startsWith("images/") ? "/" + cat.image : cat.image}
             alt={cat.title}
             className="w-full h-full object-cover select-none"
             referrerPolicy="no-referrer"
