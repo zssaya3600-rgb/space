@@ -260,6 +260,7 @@ export default function App() {
   const [failedImages, setFailedImages] = useState<Record<string, boolean>>({});
   const [pathInputWarning, setPathInputWarning] = useState<string | null>(null);
   const [manualPathInput, setManualPathInput] = useState("");
+  const [formSelectedImageIndex, setFormSelectedImageIndex] = useState<number | null>(null);
 
   useEffect(() => {
     const val = manualPathInput.trim();
@@ -610,6 +611,9 @@ export default function App() {
     setFormDrawingType(project.drawings[0]?.svgType || "exhibition-floor");
     setFormImages((project.images || []).filter(img => img.startsWith("data:") || img.startsWith("blob:") || img.startsWith("http") || img.startsWith("/")));
     
+    setFormSelectedImageIndex(null);
+    setManualPathInput("");
+    
     const flowText = project.userFlow.map(f => `${f.step}:${f.title}:${f.description}`).join("\n");
     setFormUserFlow(flowText);
     
@@ -637,6 +641,9 @@ export default function App() {
     setFormDrawingType("exhibition-floor");
     setFormUserFlow("Zone 1:Welcome Area:관람객의 호기심을 유도하는 낮은 조도의 저밀도 진입동선\nZone 2:Core Experience:브랜드 핵심 콘텐츠가 입체감 있게 전달되는 인터랙티브 존");
     setFormImages([]);
+    
+    setFormSelectedImageIndex(null);
+    setManualPathInput("");
     
     setFormPanoramaUrl("");
     setFormVideoUrl("");
@@ -762,6 +769,8 @@ export default function App() {
 
   const removeFormImage = (indexToRemove: number) => {
     setFormImages(prev => prev.filter((_, idx) => idx !== indexToRemove));
+    setFormSelectedImageIndex(null);
+    setManualPathInput("");
   };
 
   const handleDirectImageUpload = (files: FileList) => {
@@ -1231,7 +1240,9 @@ export default function App() {
                         }
                         document.getElementById(`file-upload-${cat.id}`)?.click();
                       }}
-                      className="w-full h-24 bg-[#040608] hover:bg-[#070b11] border border-zinc-950 hover:border-sky-500/40 rounded-lg overflow-hidden flex items-center justify-center p-2 mt-3 mb-3 relative transition-all duration-300 cursor-pointer group/upload"
+                      className={`w-full h-24 bg-[#040608] hover:bg-[#070b11] border border-zinc-950 hover:border-sky-500/40 rounded-lg overflow-hidden flex items-center justify-center mt-3 mb-3 relative transition-all duration-300 cursor-pointer group/upload ${
+                        cat.image ? "p-0" : "p-2"
+                      }`}
                     >
                       {/* Hidden File Input */}
                       <input
@@ -1243,7 +1254,7 @@ export default function App() {
                       />
 
                       {cat.image ? (
-                        <div className="relative w-full h-full flex items-center justify-center">
+                        <div className="relative w-full h-full flex items-center justify-center overflow-hidden">
                           {failedImages[cat.image] ? (
                             <div className="w-full h-full flex flex-col items-center justify-center bg-rose-950/30 border border-rose-500/30 text-rose-300 text-[8px] leading-tight text-center p-1 font-mono" title="이미지를 찾을 수 없습니다.">
                               <AlertCircle className="w-4 h-4 text-rose-400 mb-0.5" />
@@ -1253,7 +1264,7 @@ export default function App() {
                             <img 
                               src={resolveImageSrc(cat.image)} 
                               alt={cat.title} 
-                              className="w-full h-full object-contain select-none"
+                              className="w-full h-full object-cover object-center select-none"
                               referrerPolicy="no-referrer"
                               onError={() => handleImageError(cat.image)}
                               onLoad={() => handleImageLoad(cat.image)}
@@ -1725,11 +1736,19 @@ export default function App() {
                                 </div>
 
                                 {failedImages[uploadedImages[activeImageIndex]] ? (
-                                  <div className="w-full h-full flex flex-col items-center justify-center p-6 bg-rose-950/20 text-center font-mono select-none">
+                                  <div className="w-full h-full flex flex-col items-center justify-center p-6 bg-rose-950/20 text-center font-mono select-none border border-rose-500/30 rounded">
                                     <AlertCircle className="w-8 h-8 text-rose-500 mb-2 animate-pulse" />
                                     <p className="text-xs text-rose-300 font-bold">이미지를 찾을 수 없습니다.</p>
-                                    <p className="text-[10px] text-zinc-400 mt-1">public/images 폴더와 파일명을 확인해주세요.</p>
-                                    <div className="mt-3 bg-zinc-950/90 border border-zinc-800 rounded px-2.5 py-1.5 flex items-center gap-2 max-w-[90%] overflow-hidden">
+                                    <p className="text-[10px] text-zinc-400 mt-1 max-w-[85%] leading-relaxed">
+                                      이미지 URL 또는 /images/파일명.png 경로를 확인해주세요.
+                                    </p>
+                                    
+                                    <div className="mt-3.5 text-[9.5px] text-zinc-500 space-y-1 text-left bg-black/50 p-2.5 rounded border border-zinc-900/60 font-sans max-w-[85%]">
+                                      <p className="truncate"><span className="text-rose-400 font-bold">•</span> 외부 URL 예시: <span className="text-zinc-400 font-mono text-[9px]">https://example.com/atlas_main_01.png</span></p>
+                                      <p className="truncate"><span className="text-sky-400 font-bold">•</span> 내부 경로 예시: <span className="text-zinc-400 font-mono text-[9px]">/images/atlas_main_01.png</span></p>
+                                    </div>
+
+                                    <div className="mt-4 bg-zinc-950/90 border border-zinc-800 rounded px-2.5 py-1.5 flex items-center gap-2 max-w-[90%] overflow-hidden">
                                       <span className="text-[9px] text-zinc-500 truncate select-all">{uploadedImages[activeImageIndex]}</span>
                                       <button
                                         type="button"
@@ -2434,222 +2453,282 @@ export default function App() {
                 </div>
               </div>
 
-              {/* Portfolio Image Upload Zone */}
-              <div>
-                <label className="block text-zinc-500 mb-1 text-[10px]">
-                  PORTFOLIO IMAGES (내컴퓨터 이미지 다중 첨부)
-                </label>
-                
-                {/* Filename guide / manual warning */}
-                <p className="text-[10px] text-zinc-400 mb-2 leading-relaxed">
-                  * <span className="text-sky-400 font-bold">안내:</span> 이미지 파일명에 한글, 공백, 특수문자, 괄호가 포함된 경우 오류 방지를 위해 자동으로 안전한 파일명으로 변환되어 저장됩니다. 가능하면 파일명은 <span className="text-sky-400 font-bold underline">영문 소문자, 숫자, 언더바(_)</span>만 사용해주세요.
-                </p>
+              {/* IMAGE URL & PATH MANAGER (이미지 URL & 경로 매니저) */}
+              <div className="space-y-4 border-t border-zinc-900 pt-4">
+                <div>
+                  <label className="block text-sky-400 font-bold text-[10px] uppercase tracking-wider mb-1.5 flex items-center gap-1.5">
+                    <Sparkles className="w-4 h-4 text-sky-400" />
+                    <span>PROJECT IMAGES (프로젝트 이미지 갤러리)</span>
+                  </label>
+                  <p className="text-[10px] text-zinc-400 leading-normal mb-2.5">
+                    프로젝트 이미지 목록입니다. 썸네일을 <strong>클릭</strong>하면 아래 입력창에서 이미지 주소를 직접 수정(REPLACE), 복사(COPY) 또는 삭제(DELETE)할 수 있습니다.
+                  </p>
 
-                {/* Drag and drop target wrapper */}
-                <div
-                  onDragOver={handleDragOver}
-                  onDragLeave={handleDragLeave}
-                  onDrop={handleDrop}
-                  className={`border border-dashed rounded-lg p-5 text-center transition-all cursor-pointer ${
-                    isDragging
-                      ? "border-sky-400 bg-sky-950/20"
-                      : "border-zinc-850 hover:border-sky-500/30 bg-zinc-950/40"
-                  }`}
-                  onClick={() => document.getElementById("portfolio-image-input")?.click()}
-                >
-                  <input
-                    type="file"
-                    id="portfolio-image-input"
-                    multiple
-                    accept="image/*"
-                    onChange={handleFileSelect}
-                    className="hidden"
-                  />
-                  <div className="flex flex-col items-center justify-center space-y-1.5">
-                    <Sparkles className="w-5 h-5 text-sky-400/70" />
-                    <p className="text-[11px] text-zinc-300">
-                      이미지 파일을 여기로 드래그앤드롭 하거나 <span className="text-sky-400 underline">클릭해서 선택</span>하세요.
-                    </p>
-                    <p className="text-[9px] text-zinc-500 font-mono">
-                      * 다중 첨부 가능 (자동 최적화 압축 지원)
-                    </p>
-                  </div>
-                </div>
-
-                {/* Image Storage & Environment Guide Box */}
-                <div className="p-4 rounded-lg bg-[#06080c] border border-sky-950/45 space-y-2.5 font-sans mt-3">
-                  <div className="flex items-center gap-1.5 text-sky-400 font-bold uppercase tracking-wider text-[10px]">
-                    <HelpCircle className="w-4 h-4 text-sky-400" />
-                    <span>IMAGE STORAGE & RECOVERY GUIDE (이미지 연동 안내 가이드)</span>
-                  </div>
-                  
-                  <div className="space-y-2 text-[10.5px] text-zinc-400 leading-relaxed">
-                    <p>
-                      * 현재 이 포트폴리오 사이트는 이미지를 <code className="bg-zinc-900 px-1.5 py-0.5 rounded text-sky-400 font-mono text-[10px]">/images/파일명.png</code> 형태의 상대 경로로 저장하고 있습니다. 
-                      따라서 <strong>실제 이미지 파일은 반드시 프로젝트의 <code className="bg-zinc-900 px-1.5 py-0.5 rounded text-zinc-300 font-mono text-[10px]">public/images</code> 폴더 안에 업로드</strong>되어 존재해야만 화면에 최종 정상 출력됩니다.
-                    </p>
-                    <p className="text-sky-300 font-semibold bg-sky-950/20 p-2 rounded border border-sky-900/20 leading-snug">
-                      “이미지가 보이지 않는 경우, 실제 이미지 파일을 VS Code 프로젝트의 public/images 폴더에 넣고 /images/파일명.png 형식으로 입력해주세요.”
-                    </p>
-                    
-                    {/* Examples and Best Practices */}
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5 bg-black/40 p-2.5 rounded border border-zinc-900 text-[10px] font-mono">
-                      <div>
-                        <span className="text-zinc-500 block text-[9px] uppercase">1. 로컬 실제 파일 경로 (VS Code)</span>
-                        <span className="text-zinc-300 font-bold">public/images/atlas_main_01.png</span>
-                      </div>
-                      <div>
-                        <span className="text-zinc-500 block text-[9px] uppercase">2. 사이트 입력 경로 (APP PATH)</span>
-                        <span className="text-sky-400 font-bold">/images/atlas_main_01.png</span>
-                      </div>
+                  {formImages.length === 0 ? (
+                    <div className="border border-dashed border-zinc-850 rounded-lg p-6 text-center bg-zinc-950/40">
+                      <p className="text-[11px] text-zinc-500">등록된 이미지가 없습니다. 아래 입력창에 이미지 URL을 직접 입력해 추가하세요.</p>
                     </div>
-
-                    <div className="pt-1.5 border-t border-zinc-900/50 space-y-1 text-[9.5px] text-zinc-500">
-                      <p className="flex items-start gap-1">
-                        <span className="text-sky-500 font-bold mt-0.5">●</span>
-                        <span><strong>파일명 권장 규칙:</strong> 이미지 파일명은 <strong>영문 소문자, 숫자, 언더바(_)</strong> 사용을 강력히 권장합니다. (공백이나 한글, 특수문자 등은 웹 표준 브라우저에서 경로 인코딩 문제로 깨져 보일 수 있습니다.)</span>
-                      </p>
-                      <p className="flex items-start gap-1">
-                        <span className="text-sky-500 font-bold mt-0.5">●</span>
-                        <span><strong>브라우저 저장 팁:</strong> 내부 데이터베이스(localStorage)에는 이미지 파일 원본 자체가 아닌 <strong>문자열 경로만 저장</strong>하여 브라우저 용량 낭비 및 속도 저하를 안전하게 원천 차단합니다.</span>
-                      </p>
-                    </div>
-                  </div>
-                </div>
-
-                {/* Manual Path Input Area */}
-                <div className="mt-3 space-y-1">
-                  <label className="block text-zinc-500 text-[9px] uppercase tracking-wider">또는 이미지 URL/경로 직접 입력</label>
-                  <div className="flex gap-2">
-                    <input
-                      type="text"
-                      id="manual-image-url-input"
-                      value={manualPathInput}
-                      onChange={(e) => setManualPathInput(e.target.value)}
-                      placeholder="예: /images/파일명.png 또는 https://images.unsplash.com/..."
-                      className="flex-1 bg-zinc-950 border border-zinc-800 focus:border-sky-400 p-2 rounded text-zinc-200 focus:outline-none text-[11px]"
-                      onKeyDown={(e) => {
-                        if (e.key === 'Enter') {
-                          e.preventDefault();
-                          if (manualPathInput.trim()) {
-                            let val = manualPathInput.trim();
-                            if (!val.startsWith("http") && !val.startsWith("data:") && !val.startsWith("/")) {
-                              val = "/" + val;
-                            }
-                            setFormImages(prev => [...prev, val]);
-                            setManualPathInput("");
-                            triggerNotification("CUSTOM IMAGE PATH ADDED.");
-                          }
-                        }
-                      }}
-                    />
-                    <button
-                      type="button"
-                      onClick={() => {
-                        if (manualPathInput.trim()) {
-                          let val = manualPathInput.trim();
-                          if (!val.startsWith("http") && !val.startsWith("data:") && !val.startsWith("/")) {
-                            val = "/" + val;
-                          }
-                          setFormImages(prev => [...prev, val]);
-                          setManualPathInput("");
-                          triggerNotification("CUSTOM IMAGE PATH ADDED.");
-                        }
-                      }}
-                      className="px-3 bg-sky-950 hover:bg-sky-900 border border-sky-500/30 text-sky-300 rounded font-bold text-[11px] whitespace-nowrap"
-                    >
-                      경로 추가
-                    </button>
-                  </div>
-
-                  {/* Reactive warning for paths not starting with /images/ */}
-                  {pathInputWarning && (
-                    <div className="mt-1.5 p-2 bg-amber-950/30 border border-amber-500/35 rounded text-amber-300 text-[10px] font-sans flex items-start gap-1.5 leading-snug">
-                      <AlertCircle className="w-3.5 h-3.5 text-amber-400 shrink-0 mt-0.5" />
-                      <span>{pathInputWarning}</span>
-                    </div>
-                  )}
-                </div>
-
-                {/* On-screen error message display */}
-                {uploadError && (
-                  <div className="mt-3 p-3 bg-rose-950/20 border border-rose-500/30 rounded text-rose-300 text-xs font-mono flex items-center gap-2">
-                    <AlertCircle className="w-4 h-4 text-rose-400 shrink-0" />
-                    <span>{uploadError}</span>
-                    <button 
-                      type="button" 
-                      onClick={() => setUploadError(null)} 
-                      className="ml-auto text-zinc-500 hover:text-zinc-300 font-sans"
-                    >
-                      ✕
-                    </button>
-                  </div>
-                )}
-
-                {/* Previews wrapper if files exist */}
-                {formImages.length > 0 && (
-                  <div className="mt-4 space-y-3">
-                    <div>
-                      <p className="text-[9px] text-zinc-500 font-mono uppercase tracking-wider mb-1.5">ATTACHED RENDERS ({formImages.length} IMAGES):</p>
-                      <div className="flex flex-wrap gap-2">
-                        {formImages.map((img, idx) => (
-                          <div key={idx} className="relative w-16 aspect-[16/9] rounded border border-zinc-800 overflow-hidden group">
+                  ) : (
+                    <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5">
+                      {formImages.map((img, idx) => {
+                        const isSelected = formSelectedImageIndex === idx;
+                        return (
+                          <div 
+                            key={idx} 
+                            onClick={() => {
+                              setFormSelectedImageIndex(idx);
+                              setManualPathInput(img);
+                              triggerNotification(`IMAGE #${idx + 1} SELECTED.`);
+                            }}
+                            className={`relative aspect-[16/9] rounded border bg-zinc-950 overflow-hidden cursor-pointer transition-all group ${
+                              isSelected 
+                                ? "border-sky-400 ring-1 ring-sky-400/50 scale-[1.02] shadow-lg shadow-sky-950/40" 
+                                : "border-zinc-850 hover:border-zinc-700 hover:scale-[1.01]"
+                            }`}
+                          >
                             {failedImages[img] ? (
-                              <div className="w-full h-full flex flex-col items-center justify-center bg-rose-950/30 text-rose-300 text-[7px] font-mono leading-none p-0.5" title="이미지를 찾을 수 없습니다.">
-                                <AlertCircle className="w-3.5 h-3.5 text-rose-400 mb-0.5" />
+                              <div className="w-full h-full flex flex-col items-center justify-center bg-rose-950/30 text-rose-300 text-[8px] font-mono leading-none p-1 text-center" title="이미지를 찾을 수 없습니다.">
+                                <AlertCircle className="w-4 h-4 text-rose-400 mb-1 animate-pulse" />
                                 <span>ERR</span>
                               </div>
                             ) : (
                               <img
                                 src={resolveImageSrc(img)}
-                                alt="preview"
+                                alt={`render ${idx + 1}`}
                                 className="w-full h-full object-cover"
                                 referrerPolicy="no-referrer"
                                 onError={() => handleImageError(img)}
                                 onLoad={() => handleImageLoad(img)}
                               />
                             )}
-                            <button
-                              type="button"
-                              onClick={(e) => {
-                                e.stopPropagation();
-                                removeFormImage(idx);
-                              }}
-                              className="absolute inset-0 bg-black/80 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity text-rose-500 hover:text-rose-400"
-                              title="Remove image"
-                            >
-                              <Trash2 className="w-3.5 h-3.5" />
-                            </button>
-                          </div>
-                        ))}
-                      </div>
-                    </div>
+                            
+                            {/* Number badge */}
+                            <div className="absolute top-1 left-1 px-1 bg-black/80 border border-zinc-800 rounded text-[8px] font-mono text-zinc-400">
+                              #{idx + 1}
+                            </div>
 
-                    {/* Path copy/view list */}
-                    <div className="p-3 rounded bg-black/40 border border-zinc-900 space-y-2">
-                      <span className="block text-[9px] text-sky-400 font-bold uppercase tracking-wider font-mono">
-                        현재 저장된 이미지 경로 목록 (CLICK TO COPY)
-                      </span>
-                      <div className="space-y-1.5 max-h-[140px] overflow-y-auto pr-1">
-                        {formImages.map((img, idx) => (
-                          <div key={idx} className="flex items-center justify-between gap-2 p-1.5 bg-zinc-950 rounded border border-zinc-900/60 font-mono text-[10px]">
-                            <span className="truncate flex-1 text-zinc-400 select-all text-[9.5px]">{img}</span>
-                            <button
-                              type="button"
-                              onClick={() => {
-                                navigator.clipboard.writeText(img);
-                                triggerNotification("IMAGE PATH COPIED.");
-                              }}
-                              className="px-2 py-0.5 bg-sky-950 hover:bg-sky-900 border border-sky-800/40 text-sky-300 rounded text-[8px] font-bold tracking-wider uppercase shrink-0 transition-all"
-                            >
-                              COPY
-                            </button>
+                            {/* Selected overlay marker */}
+                            {isSelected && (
+                              <div className="absolute inset-0 bg-sky-950/25 flex items-center justify-center">
+                                <span className="bg-sky-500 text-black text-[8px] font-black tracking-wider px-1.5 py-0.5 rounded uppercase">
+                                  EDITING
+                                </span>
+                              </div>
+                            )}
                           </div>
-                        ))}
+                        );
+                      })}
+                    </div>
+                  )}
+                </div>
+
+                {/* Input & Control UI */}
+                <div className="space-y-2 bg-[#090d14]/40 border border-zinc-900/80 p-3.5 rounded-lg">
+                  <div className="flex items-center justify-between">
+                    <label className="block text-zinc-400 font-bold text-[9.5px] uppercase tracking-wider">
+                      {formSelectedImageIndex !== null ? `IMAGE #${formSelectedImageIndex + 1} 주소 수정 중` : "새 이미지 URL / 경로 입력"}
+                    </label>
+                    {formSelectedImageIndex !== null && (
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setFormSelectedImageIndex(null);
+                          setManualPathInput("");
+                        }}
+                        className="text-[9px] text-zinc-500 hover:text-zinc-300 font-mono"
+                      >
+                        [선택 해제]
+                      </button>
+                    )}
+                  </div>
+
+                  <div className="flex flex-col sm:flex-row gap-2">
+                    <input
+                      type="text"
+                      value={manualPathInput}
+                      onChange={(e) => setManualPathInput(e.target.value)}
+                      placeholder="예: /images/파일명.png 또는 https://images.unsplash.com/..."
+                      className="flex-1 bg-zinc-950 border border-zinc-800 focus:border-sky-400 p-2 rounded text-zinc-200 focus:outline-none text-[11.5px] font-mono"
+                    />
+                    
+                    <div className="flex gap-1.5">
+                      {formSelectedImageIndex === null ? (
+                        <button
+                          type="button"
+                          disabled={!manualPathInput.trim()}
+                          onClick={() => {
+                            if (manualPathInput.trim()) {
+                              let val = manualPathInput.trim();
+                              if (!val.startsWith("http") && !val.startsWith("data:") && !val.startsWith("/")) {
+                                val = "/" + val;
+                              }
+                              setFormImages(prev => [...prev, val]);
+                              setManualPathInput("");
+                              triggerNotification("NEW IMAGE PATH ADDED.");
+                            }
+                          }}
+                          className={`px-3.5 py-1.5 rounded font-bold text-[10.5px] whitespace-nowrap transition-all ${
+                            manualPathInput.trim() 
+                              ? "bg-sky-950 hover:bg-sky-900 border border-sky-500/30 text-sky-300"
+                              : "bg-zinc-900 border border-zinc-850 text-zinc-600 cursor-not-allowed"
+                          }`}
+                        >
+                          ADD IMAGE (추가)
+                        </button>
+                      ) : (
+                        <>
+                          <button
+                            type="button"
+                            disabled={!manualPathInput.trim()}
+                            onClick={() => {
+                              if (manualPathInput.trim()) {
+                                let val = manualPathInput.trim();
+                                if (!val.startsWith("http") && !val.startsWith("data:") && !val.startsWith("/")) {
+                                  val = "/" + val;
+                                }
+                                setFormImages(prev => {
+                                  const updated = [...prev];
+                                  updated[formSelectedImageIndex] = val;
+                                  return updated;
+                                });
+                                triggerNotification("IMAGE PATH REPLACED.");
+                              }
+                            }}
+                            className={`px-3.5 py-1.5 rounded font-bold text-[10.5px] whitespace-nowrap transition-all ${
+                              manualPathInput.trim()
+                                ? "bg-emerald-950 hover:bg-emerald-900 border border-emerald-500/30 text-emerald-300"
+                                : "bg-zinc-900 border border-zinc-850 text-zinc-600 cursor-not-allowed"
+                            }`}
+                          >
+                            REPLACE (변경)
+                          </button>
+
+                          <button
+                            type="button"
+                            onClick={() => {
+                              removeFormImage(formSelectedImageIndex);
+                              triggerNotification("IMAGE DELETED.");
+                            }}
+                            className="px-3.5 py-1.5 bg-rose-950 hover:bg-rose-900 border border-rose-500/30 text-rose-300 rounded font-bold text-[10.5px] whitespace-nowrap transition-all"
+                          >
+                            DELETE (삭제)
+                          </button>
+                        </>
+                      )}
+
+                      <button
+                        type="button"
+                        disabled={!manualPathInput.trim()}
+                        onClick={() => {
+                          if (manualPathInput.trim()) {
+                            navigator.clipboard.writeText(manualPathInput.trim());
+                            triggerNotification("COPIED TO CLIPBOARD.");
+                          }
+                        }}
+                        className={`px-3.5 py-1.5 rounded font-bold text-[10.5px] whitespace-nowrap transition-all ${
+                          manualPathInput.trim()
+                            ? "bg-zinc-900 hover:bg-zinc-850 border border-zinc-800 text-zinc-300"
+                            : "bg-zinc-950 border border-zinc-900 text-zinc-600 cursor-not-allowed"
+                        }`}
+                        title="주소 복사"
+                      >
+                        COPY (복사)
+                      </button>
+                    </div>
+                  </div>
+
+                  {/* Warning label if the path doesn't start with /images/ */}
+                  {pathInputWarning && (
+                    <div className="mt-1.5 p-2 bg-amber-950/30 border border-amber-500/35 rounded text-amber-300 text-[10.5px] font-sans flex items-start gap-1.5 leading-relaxed">
+                      <AlertCircle className="w-3.5 h-3.5 text-amber-400 shrink-0 mt-0.5 animate-pulse" />
+                      <span>{pathInputWarning}</span>
+                    </div>
+                  )}
+
+                  {manualPathInput.trim() && (
+                    <div className="text-[10px] text-zinc-500 font-mono mt-1 break-all bg-black/30 p-1.5 rounded border border-zinc-900/50 flex justify-between items-center gap-2">
+                      <span className="truncate"><span className="text-zinc-600 font-bold">CURRENT PATH:</span> {manualPathInput}</span>
+                      <button
+                        type="button"
+                        onClick={() => {
+                          navigator.clipboard.writeText(manualPathInput.trim());
+                          triggerNotification("IMAGE PATH COPIED.");
+                        }}
+                        className="px-1.5 py-0.5 rounded bg-zinc-900 hover:bg-zinc-850 border border-zinc-800 text-zinc-400 text-[8px] shrink-0 font-sans uppercase font-bold"
+                      >
+                        Copy URL
+                      </button>
+                    </div>
+                  )}
+                </div>
+
+                {/* Info Guide Box */}
+                <div className="p-4 rounded-lg bg-[#06080c] border border-sky-950/45 space-y-2.5 font-sans mt-3">
+                  <div className="flex items-center gap-1.5 text-sky-400 font-bold uppercase tracking-wider text-[10px]">
+                    <HelpCircle className="w-4 h-4 text-sky-400" />
+                    <span>IMAGE STORAGE & RECOVERY GUIDE (이미지 주소 연동 가이드)</span>
+                  </div>
+                  
+                  <div className="space-y-2 text-[10.5px] text-zinc-400 leading-relaxed">
+                    <p>
+                      * <strong>안전한 보관 보장:</strong> 이미지 자체를 용량이 큰 base64 파일로 브라우저에 가두어두지 않고, <strong>가볍고 깨끗한 텍스트 주소 문자열만 localStorage에 저장</strong>합니다. 이에 따라 Google AI Studio를 나갔다 다시 돌아와도, 작성된 URL 그대로 이미지를 안전하게 로드할 수 있습니다.
+                    </p>
+                    <p className="text-sky-300 font-semibold bg-sky-950/20 p-2.5 rounded border border-sky-900/20 leading-snug">
+                      “외부 웹 사이트에 올린 이미지 URL 주소(HTTPS)를 복사해서 넣거나, 실제 이미지 파일을 VS Code의 public/images 폴더에 직접 올려서 /images/파일명.png 형식으로 입력하면 아주 안정적으로 사이트에 표시됩니다.”
+                    </p>
+                    
+                    {/* Examples and Best Practices */}
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5 bg-black/40 p-2.5 rounded border border-zinc-900 text-[10px] font-mono">
+                      <div>
+                        <span className="text-zinc-500 block text-[9px] uppercase">1. 외부 URL (HTTP / HTTPS) 예시</span>
+                        <span className="text-sky-400 font-bold">https://example.com/atlas_main_01.png</span>
+                      </div>
+                      <div>
+                        <span className="text-zinc-500 block text-[9px] uppercase">2. 내부 폴더 상대 경로 예시</span>
+                        <span className="text-sky-400 font-bold">/images/atlas_main_01.png</span>
                       </div>
                     </div>
                   </div>
-                )}
+                </div>
+
+                {/* Auxiliary File Upload section (보조 기능) */}
+                <div className="p-3.5 bg-zinc-950/40 border border-zinc-900 rounded-lg space-y-2.5">
+                  <div className="flex items-center justify-between">
+                    <span className="text-zinc-500 font-bold text-[9.5px] uppercase tracking-wider">
+                      보조 기능: 내컴퓨터 이미지 파일 직접 추가 (Base64 변환)
+                    </span>
+                  </div>
+                  <p className="text-[10px] text-zinc-500">
+                    로컬 이미지 파일을 사이트에 직접 삽입하고 싶을 때 사용하는 보조 도구입니다. 파일을 선택하면 자동으로 압축된 이미지 데이터 경로가 갤러리에 추가됩니다.
+                  </p>
+                  
+                  <div
+                    onDragOver={handleDragOver}
+                    onDragLeave={handleDragLeave}
+                    onDrop={handleDrop}
+                    className={`border border-dashed rounded p-3.5 text-center transition-all cursor-pointer ${
+                      isDragging
+                        ? "border-sky-400 bg-sky-950/15"
+                        : "border-zinc-850 hover:border-sky-500/20 bg-zinc-950/20"
+                    }`}
+                    onClick={() => document.getElementById("portfolio-image-input")?.click()}
+                  >
+                    <input
+                      type="file"
+                      id="portfolio-image-input"
+                      multiple
+                      accept="image/*"
+                      onChange={handleFileSelect}
+                      className="hidden"
+                    />
+                    <div className="flex flex-col items-center justify-center space-y-1">
+                      <Sparkles className="w-4 h-4 text-sky-400/50" />
+                      <p className="text-[10px] text-zinc-400">
+                        여기로 이미지를 드래그하거나 <span className="text-sky-400 underline">클릭하여 선택</span>
+                      </p>
+                    </div>
+                  </div>
+                </div>
               </div>
 
               {/* Form Actions */}
