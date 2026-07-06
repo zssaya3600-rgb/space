@@ -13,14 +13,14 @@ export const defaultCategories: Category[] = [
     num: "02", 
     title: "Exhibition Research", 
     description: "Museum Research · Spatial Archives · Design analysis", 
-    image: "/images/project2.png" 
+    image: "/images/project2.jpg" 
   },
   { 
     id: "03", 
     num: "03", 
     title: "Commercial Interior", 
     description: "Commercial space design and interior layout", 
-    image: "/images/commercial_01.png" 
+    image: "/images/ezen_03.png" 
   },
   { 
     id: "04", 
