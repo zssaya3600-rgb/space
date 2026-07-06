@@ -70,25 +70,19 @@
         "Enscape"
         
       ],
-      "concept": "도시 농업과 커뮤니티 공간을 연결하는 미래지향적 스마트 팜 플랫폼 제안.",
+      "concept": "도시 자원 고립과 1인가구 고립을 연결하는 미래지향적 스마트 팜 플랫폼 제안.",
       "process": [
         "Site Survey",
         "Core Identity",
         "Space Planning",
         "Lobby Layout"
       ],
-      "drawings": [
-        {
-          "title": "Overall Layout Plan",
-          "description": "전체 층별 동선 레이아웃 및 영역 구획 도면",
-          "svgType": "exhibition-floor"
-        }
-      ],
+     
       "userFlow": [
         {
-          "step": "Zone A",
-          "title": "Intro Foyer",
-          "description": "스마트 팜 기술 소개 전초 영역"
+          "step": "connect",
+          "title": "연결되는 공간",
+          "description": "공유식당과 피크닉 가든"
         }
       ],
       "materialLighting": {
