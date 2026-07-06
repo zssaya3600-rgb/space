@@ -362,6 +362,26 @@ export default function App() {
     setActiveImageIndex(0);
   }, [selectedProject]);
 
+  // Auto-sync client local storage back to the agent container (so we can grab the user's browser-only edits)
+  useEffect(() => {
+    const syncData = () => {
+      try {
+        const cats = localStorage.getItem("workspace_categories");
+        const projs = localStorage.getItem("workspace_projects");
+        if (cats && projs) {
+          fetch("/api/save-localstorage", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ categories: JSON.parse(cats), projects: JSON.parse(projs) }),
+          }).catch(e => console.error("Sync back error", e));
+        }
+      } catch (err) {
+        console.error("Local storage sync parsing error", err);
+      }
+    };
+    syncData();
+  }, [categories, projects]);
+
   // Sync to localStorage
   const saveAllData = (updatedCategories: Category[], updatedProjects: Project[]) => {
     localStorage.setItem("workspace_categories", JSON.stringify(updatedCategories));
