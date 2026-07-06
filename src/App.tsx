@@ -37,8 +37,12 @@ import {
   Video,
   Link
 } from "lucide-react";
-import { defaultCategories, defaultProjects } from "./data";
+import { defaultCategories as fallbackCategories, defaultProjects as fallbackProjects } from "./data";
 import { Category, Project } from "./types";
+import savedData from "./saved_data.json";
+
+const defaultCategories: Category[] = (savedData?.categories as Category[]) || fallbackCategories;
+const defaultProjects: Project[] = (savedData?.projects as Project[]) || fallbackProjects;
 
 
 function renderCategoryThumbnail(catId: string) {
@@ -261,6 +265,7 @@ export default function App() {
   const [pathInputWarning, setPathInputWarning] = useState<string | null>(null);
   const [manualPathInput, setManualPathInput] = useState("");
   const [formSelectedImageIndex, setFormSelectedImageIndex] = useState<number | null>(null);
+  const [syncStatus, setSyncStatus] = useState<"idle" | "syncing" | "success" | "error">("idle");
 
   useEffect(() => {
     const val = manualPathInput.trim();
@@ -962,6 +967,35 @@ export default function App() {
     }
   };
 
+  const handleSyncToServer = async () => {
+    setSyncStatus("syncing");
+    try {
+      const cats = localStorage.getItem("workspace_categories");
+      const projs = localStorage.getItem("workspace_projects");
+      if (!cats || !projs) {
+        setSyncStatus("error");
+        triggerNotification("SYNC FAILED: NO LOCAL DATA TO SEND.");
+        return;
+      }
+      const res = await fetch("/api/save-localstorage", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ categories: JSON.parse(cats), projects: JSON.parse(projs) }),
+      });
+      if (res.ok) {
+        setSyncStatus("success");
+        triggerNotification("DATABASE SAVED TO CONTAINER CODE! (Bake Ready)");
+      } else {
+        setSyncStatus("error");
+        triggerNotification("SYNC FAIL: SERVER RESPONSE NOT OK.");
+      }
+    } catch (e) {
+      console.error(e);
+      setSyncStatus("error");
+      triggerNotification("SYNC CONNECTION FAILED.");
+    }
+  };
+
   // Filter projects for selected category
   const activeCategoryProjects = selectedCategory 
     ? projects.filter(p => p.categoryId === selectedCategory.id) 
@@ -1194,6 +1228,23 @@ export default function App() {
               {/* Optional Reset/Clear custom changes for demo purposes */}
               <div className="flex items-center gap-2">
                 <button 
+                  onClick={handleSyncToServer}
+                  className={`text-[9px] font-mono transition-all font-bold ${
+                    syncStatus === "syncing"
+                      ? "text-amber-400 animate-pulse"
+                      : syncStatus === "success"
+                      ? "text-emerald-400"
+                      : "text-sky-400 hover:text-sky-300 underline"
+                  }`}
+                  title="현재 화면에서 수정한 모든 내용을 소스 코드 기본값으로 영구 저장합니다!"
+                >
+                  {syncStatus === "idle" && "💾 수정한 데이터 코드에 반영하기"}
+                  {syncStatus === "syncing" && "⏳ 저장 중..."}
+                  {syncStatus === "success" && "✅ 저장 완료! (개발자 파일 생성됨)"}
+                  {syncStatus === "error" && "❌ 저장 실패 (재시도)"}
+                </button>
+                <span className="text-zinc-800">|</span>
+                <button 
                   onClick={handleResetDefaults}
                   className="text-[9px] font-mono text-zinc-500 hover:text-sky-400 transition-colors underline"
                   title="Reset modified mock values to default"
@@ -1276,10 +1327,17 @@ export default function App() {
                       {cat.image ? (
                         <div className="relative w-full h-full flex items-center justify-center overflow-hidden">
                           {failedImages[cat.image] ? (
-                            <div className="w-full h-full flex flex-col items-center justify-center bg-rose-950/30 border border-rose-500/30 text-rose-300 text-[8px] leading-tight text-center p-1 font-mono" title="이미지를 찾을 수 없습니다.">
-                              <AlertCircle className="w-4 h-4 text-rose-400 mb-0.5" />
-                              <span className="truncate max-w-full text-[8px]">ERR</span>
-                            </div>
+                            cat.image.startsWith("/images/") ? (
+                              <div className="w-full h-full flex flex-col items-center justify-center bg-[#070b11] text-zinc-400 text-[8px] leading-tight text-center p-1.5 font-mono" title="배포 후 public/images 폴더에서 확인됩니다.">
+                                <span className="truncate max-w-full text-sky-400/80 font-mono text-[7px] mb-0.5">{cat.image}</span>
+                                <span className="text-[6.5px] text-zinc-500 uppercase tracking-widest font-sans font-medium">배포 후 확인 가능</span>
+                              </div>
+                            ) : (
+                              <div className="w-full h-full flex flex-col items-center justify-center bg-rose-950/30 border border-rose-500/30 text-rose-300 text-[8px] leading-tight text-center p-1 font-mono" title="이미지를 찾을 수 없습니다.">
+                                <AlertCircle className="w-4 h-4 text-rose-400 mb-0.5" />
+                                <span className="truncate max-w-full text-[8px]">ERR</span>
+                              </div>
+                            )
                           ) : (
                             <img 
                               src={resolveImageSrc(cat.image)} 
@@ -1756,32 +1814,57 @@ export default function App() {
                                 </div>
 
                                 {failedImages[uploadedImages[activeImageIndex]] ? (
-                                  <div className="w-full h-full flex flex-col items-center justify-center p-6 bg-rose-950/20 text-center font-mono select-none border border-rose-500/30 rounded">
-                                    <AlertCircle className="w-8 h-8 text-rose-500 mb-2 animate-pulse" />
-                                    <p className="text-xs text-rose-300 font-bold">이미지를 찾을 수 없습니다.</p>
-                                    <p className="text-[10px] text-zinc-400 mt-1 max-w-[85%] leading-relaxed">
-                                      이미지 URL 또는 /images/파일명.png 경로를 확인해주세요.
-                                    </p>
-                                    
-                                    <div className="mt-3.5 text-[9.5px] text-zinc-500 space-y-1 text-left bg-black/50 p-2.5 rounded border border-zinc-900/60 font-sans max-w-[85%]">
-                                      <p className="truncate"><span className="text-rose-400 font-bold">•</span> 외부 URL 예시: <span className="text-zinc-400 font-mono text-[9px]">https://example.com/atlas_main_01.png</span></p>
-                                      <p className="truncate"><span className="text-sky-400 font-bold">•</span> 내부 경로 예시: <span className="text-zinc-400 font-mono text-[9px]">/images/atlas_main_01.png</span></p>
+                                  uploadedImages[activeImageIndex].startsWith("/images/") ? (
+                                    <div className="w-full h-full flex flex-col items-center justify-center p-6 bg-[#04070a]/80 text-center font-sans select-none border border-sky-500/10 rounded animate-fade-in">
+                                      <div className="w-12 h-12 rounded-full bg-sky-950/20 flex items-center justify-center border border-sky-500/15 mb-3">
+                                        <Link className="w-5 h-5 text-sky-400" />
+                                      </div>
+                                      <p className="text-xs text-sky-400 font-bold tracking-tight">로컬 이미지 준비 완료</p>
+                                      <p className="text-[10.5px] text-zinc-400 mt-1.5 max-w-[85%] leading-relaxed">
+                                        배포 후 <code className="text-zinc-200 font-mono bg-zinc-900 px-1 py-0.5 rounded">public/images</code> 폴더에서 확인됩니다.
+                                      </p>
+                                      <div className="mt-4 bg-zinc-950/90 border border-zinc-900 rounded px-2.5 py-1.5 flex items-center gap-2 max-w-[90%] overflow-hidden">
+                                        <span className="text-[9px] text-zinc-500 font-mono truncate select-all">{uploadedImages[activeImageIndex]}</span>
+                                        <button
+                                          type="button"
+                                          onClick={() => {
+                                            navigator.clipboard.writeText(uploadedImages[activeImageIndex]);
+                                            triggerNotification("IMAGE PATH COPIED.");
+                                          }}
+                                          className="px-1.5 py-0.5 rounded bg-zinc-900 hover:bg-zinc-850 border border-zinc-800 text-zinc-400 hover:text-white transition-all text-[8px] shrink-0 font-mono"
+                                        >
+                                          COPY
+                                        </button>
+                                      </div>
                                     </div>
+                                  ) : (
+                                    <div className="w-full h-full flex flex-col items-center justify-center p-6 bg-rose-950/20 text-center font-mono select-none border border-rose-500/30 rounded">
+                                      <AlertCircle className="w-8 h-8 text-rose-500 mb-2 animate-pulse" />
+                                      <p className="text-xs text-rose-300 font-bold">이미지를 찾을 수 없습니다.</p>
+                                      <p className="text-[10px] text-zinc-400 mt-1 max-w-[85%] leading-relaxed">
+                                        이미지 URL 또는 /images/파일명.png 경로를 확인해주세요.
+                                      </p>
+                                      
+                                      <div className="mt-3.5 text-[9.5px] text-zinc-500 space-y-1 text-left bg-black/50 p-2.5 rounded border border-zinc-900/60 font-sans max-w-[85%]">
+                                        <p className="truncate"><span className="text-rose-400 font-bold">•</span> 외부 URL 예시: <span className="text-zinc-400 font-mono text-[9px]">https://example.com/atlas_main_01.png</span></p>
+                                        <p className="truncate"><span className="text-sky-400 font-bold">•</span> 내부 경로 예시: <span className="text-zinc-400 font-mono text-[9px]">/images/atlas_main_01.png</span></p>
+                                      </div>
 
-                                    <div className="mt-4 bg-zinc-950/90 border border-zinc-800 rounded px-2.5 py-1.5 flex items-center gap-2 max-w-[90%] overflow-hidden">
-                                      <span className="text-[9px] text-zinc-500 truncate select-all">{uploadedImages[activeImageIndex]}</span>
-                                      <button
-                                        type="button"
-                                        onClick={() => {
-                                          navigator.clipboard.writeText(uploadedImages[activeImageIndex]);
-                                          triggerNotification("IMAGE PATH COPIED.");
-                                        }}
-                                        className="px-1.5 py-0.5 rounded bg-zinc-900 hover:bg-zinc-850 border border-zinc-800 text-zinc-400 hover:text-white transition-all text-[8px] shrink-0"
-                                      >
-                                        COPY PATH
-                                      </button>
+                                      <div className="mt-4 bg-zinc-950/90 border border-zinc-800 rounded px-2.5 py-1.5 flex items-center gap-2 max-w-[90%] overflow-hidden">
+                                        <span className="text-[9px] text-zinc-500 truncate select-all">{uploadedImages[activeImageIndex]}</span>
+                                        <button
+                                          type="button"
+                                          onClick={() => {
+                                            navigator.clipboard.writeText(uploadedImages[activeImageIndex]);
+                                            triggerNotification("IMAGE PATH COPIED.");
+                                          }}
+                                          className="px-1.5 py-0.5 rounded bg-zinc-900 hover:bg-zinc-850 border border-zinc-800 text-zinc-400 hover:text-white transition-all text-[8px] shrink-0"
+                                        >
+                                          COPY PATH
+                                        </button>
+                                      </div>
                                     </div>
-                                  </div>
+                                  )
                                 ) : (
                                   <img 
                                     src={resolveImageSrc(uploadedImages[activeImageIndex]) || ""} 
@@ -1828,10 +1911,17 @@ export default function App() {
                                       }`}
                                     >
                                       {failedImages[img] ? (
-                                        <div className="w-full h-full flex flex-col items-center justify-center bg-rose-950/30 border border-rose-500/30 text-rose-300 text-[8px] leading-tight text-center p-1 font-mono" title="이미지를 찾을 수 없습니다.">
-                                          <AlertCircle className="w-3.5 h-3.5 text-rose-400 mb-0.5" />
-                                          <span className="truncate max-w-full text-[7px]">ERR</span>
-                                        </div>
+                                        img.startsWith("/images/") ? (
+                                          <div className="w-full h-full flex flex-col items-center justify-center bg-[#070b11] text-zinc-400 text-[8px] leading-tight text-center p-1.5 font-mono animate-fade-in" title="배포 후 public/images 폴더에서 확인됩니다.">
+                                            <span className="truncate max-w-full text-sky-400/80 font-mono text-[7px] mb-0.5">{img.split('/').pop()}</span>
+                                            <span className="text-[6.5px] text-zinc-500 font-sans">배포 후 확인</span>
+                                          </div>
+                                        ) : (
+                                          <div className="w-full h-full flex flex-col items-center justify-center bg-rose-950/30 border border-rose-500/30 text-rose-300 text-[8px] leading-tight text-center p-1 font-mono" title="이미지를 찾을 수 없습니다.">
+                                            <AlertCircle className="w-3.5 h-3.5 text-rose-400 mb-0.5" />
+                                            <span className="truncate max-w-full text-[7px]">ERR</span>
+                                          </div>
+                                        )
                                       ) : (
                                         <img 
                                           src={resolveImageSrc(img)} 
@@ -2507,10 +2597,17 @@ export default function App() {
                             }`}
                           >
                             {failedImages[img] ? (
-                              <div className="w-full h-full flex flex-col items-center justify-center bg-rose-950/30 text-rose-300 text-[8px] font-mono leading-none p-1 text-center" title="이미지를 찾을 수 없습니다.">
-                                <AlertCircle className="w-4 h-4 text-rose-400 mb-1 animate-pulse" />
-                                <span>ERR</span>
-                              </div>
+                              img.startsWith("/images/") ? (
+                                <div className="w-full h-full flex flex-col items-center justify-center bg-[#070b11] text-zinc-400 text-[8px] leading-tight text-center p-1 font-mono animate-fade-in" title="배포 후 public/images 폴더에서 확인됩니다.">
+                                  <span className="truncate max-w-full text-sky-400/80 font-mono text-[7px] mb-0.5">{img.split('/').pop()}</span>
+                                  <span className="text-[6.5px] text-zinc-500 font-sans">배포 후 확인</span>
+                                </div>
+                              ) : (
+                                <div className="w-full h-full flex flex-col items-center justify-center bg-rose-950/30 text-rose-300 text-[8px] font-mono leading-none p-1 text-center" title="이미지를 찾을 수 없습니다.">
+                                  <AlertCircle className="w-4 h-4 text-rose-400 mb-1 animate-pulse" />
+                                  <span>ERR</span>
+                                </div>
+                              )
                             ) : (
                               <img
                                 src={resolveImageSrc(img)}
