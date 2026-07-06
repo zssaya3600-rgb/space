@@ -11,45 +11,50 @@
       "id": "02",
       "num": "02",
       "title": "Exhibition Research",
-      "description": "Museum · Media Art · Pop-up Store · Spatial Branding"
+      "description": "Museum · Media Art · Pop-up Store · Spatial Branding",
       "image": "/images/project2.jpg"
     },
     {
       "id": "03",
       "num": "03",
       "title": "Commercial Interior",
-      "description": "Academy · Cafe · Retail · Education Space"
+      "description": "Academy · Cafe · Retail · Education Space",
       "image": "/images/ezen_03.png"
     },
     {
       "id": "04",
       "num": "04",
       "title": "Residential Design",
-      "description": "House · Apartment · Lifestyle Space"
+      "description": "House · Apartment · Lifestyle Space",
+      "image": "/images/ezen_03.png"
     },
     {
       "id": "05",
       "num": "05",
       "title": "3D Visualization",
-      "description": "SketchUp · Enscape · Rendering · Post Production"
+      "description": "SketchUp · Enscape · Rendering · Post Production",
+      "image": "/images/ezen_03.png"
     },
     {
       "id": "06",
       "num": "06",
       "title": "Design Process",
-      "description": "Sketch · Massing · Modeling · Material · Rendering"
+      "description": "Sketch · Massing · Modeling · Material · Rendering",
+      "image": "/images/ezen_03.png"
     },
     {
       "id": "07",
       "num": "07",
       "title": "Competition Works",
-      "description": "Architecture · Space Concept · Presentation Panel"
+      "description": "Architecture · Space Concept · Presentation Panel",
+      "image": "/images/ezen_03.png"
     },
     {
       "id": "08",
       "num": "08",
       "title": "AI Workflow",
-      "description": "ChatGPT · AI Studio · Image Generation · Prompt Workflow"
+      "description": "ChatGPT · AI Studio · Image Generation · Prompt Workflow",
+      "image": "/images/ezen_03.png"
     }
   ],
   "projects": [
@@ -63,6 +68,7 @@
         "AutoCAD",
         "SketchUp",
         "Enscape"
+        
       ],
       "concept": "도시 농업과 커뮤니티 공간을 연결하는 미래지향적 스마트 팜 플랫폼 제안.",
       "process": [
