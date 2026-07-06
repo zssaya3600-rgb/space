@@ -40,6 +40,9 @@ import {
 import { defaultCategories as fallbackCategories, defaultProjects as fallbackProjects } from "./data";
 import { Category, Project } from "./types";
 import savedData from "./saved_data.json";
+import { collection, getDocs } from "firebase/firestore";
+import { db, uploadProjectImage } from "./firebase";
+import { ProjectCard } from "./components/ProjectCard";
 
 const defaultCategories: Category[] = (savedData?.categories as Category[]) || fallbackCategories;
 const defaultProjects: Project[] = (savedData?.projects as Project[]) || fallbackProjects;
@@ -214,6 +217,24 @@ export default function App() {
   const [passwordInput, setPasswordInput] = useState("");
   const [passwordError, setPasswordError] = useState("");
   
+  // Cover images from Firestore & status trackers
+  const [coverImageUrls, setCoverImageUrls] = useState<Record<string, string>>({});
+  const [uploadStates, setUploadStates] = useState<Record<string, "uploading" | "saved" | "error" | null>>({});
+
+  const getFirestoreDocId = (catId: string) => {
+    const mapping: Record<string, string> = {
+      "01": "atlas-1",
+      "02": "exhibition-research",
+      "03": "commercial-interior",
+      "04": "residential-design",
+      "05": "3d-visualization",
+      "06": "design-process",
+      "07": "competition-works",
+      "08": "ai-workflow"
+    };
+    return mapping[catId] || `project-${catId}`;
+  };
+  
   // Project creation/editing states
   const [showAddProjectModal, setShowAddProjectModal] = useState(false);
   const [editingProject, setEditingProject] = useState<Project | null>(null);
@@ -366,6 +387,48 @@ export default function App() {
     setActiveImageIndex(0);
   }, [selectedProject]);
 
+  // Fetch Cover Images from Firestore on Mount
+  useEffect(() => {
+    const fetchCoverImages = async () => {
+      try {
+        const querySnapshot = await getDocs(collection(db, "projects"));
+        const urls: Record<string, string> = {};
+        querySnapshot.forEach((doc) => {
+          const data = doc.data();
+          if (data.coverImageUrl) {
+            urls[doc.id] = data.coverImageUrl;
+          }
+        });
+        setCoverImageUrls(urls);
+      } catch (error) {
+        console.error("Error fetching cover images from Firestore:", error);
+      }
+    };
+    fetchCoverImages();
+  }, []);
+
+  const handleCoverImageUpload = async (catId: string, file: File) => {
+    const docId = getFirestoreDocId(catId);
+    setUploadStates(prev => ({ ...prev, [catId]: "uploading" }));
+    try {
+      const downloadUrl = await uploadProjectImage(docId, file);
+      setCoverImageUrls(prev => ({ ...prev, [docId]: downloadUrl }));
+      setUploadStates(prev => ({ ...prev, [catId]: "saved" }));
+      triggerNotification(`REPRESENTATIVE IMAGE FOR "${docId.toUpperCase()}" SAVED.`);
+      setTimeout(() => {
+        setUploadStates(prev => ({ ...prev, [catId]: null }));
+      }, 3000);
+    } catch (error) {
+      console.error("Upload failed:", error);
+      setUploadStates(prev => ({ ...prev, [catId]: "error" }));
+      triggerNotification("UPLOAD FAILED. CHECK CONFIG.");
+      alert(`대표 이미지 저장 중 오류가 발생했습니다: ${error instanceof Error ? error.message : String(error)}`);
+      setTimeout(() => {
+        setUploadStates(prev => ({ ...prev, [catId]: null }));
+      }, 4000);
+    }
+  };
+
   // Sync to localStorage
   const saveAllData = (updatedCategories: Category[], updatedProjects: Project[]) => {
     localStorage.setItem("workspace_categories", JSON.stringify(updatedCategories));
@@ -506,7 +569,8 @@ export default function App() {
   // Login handler
   const handleAdminLogin = (e: React.FormEvent) => {
     e.preventDefault();
-    if (passwordInput === "1111") {
+    const securePassword = (import.meta as any).env.VITE_ADMIN_PASSWORD || "1111";
+    if (passwordInput === securePassword) {
       setIsAdmin(true);
       setShowAdminModal(false);
       setPasswordInput("");
@@ -1189,11 +1253,14 @@ export default function App() {
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               {categories.map((cat) => {
                 const projectCount = projects.filter(p => p.categoryId === cat.id).length;
+                const docId = getFirestoreDocId(cat.id);
                 return (
-                  <div
+                  <ProjectCard
                     key={cat.id}
-                    id={`folder-${cat.id}`}
-                    onClick={() => {
+                    cat={cat}
+                    projectCount={projectCount}
+                    isSelected={selectedCategory?.id === cat.id}
+                    onSelect={() => {
                       setSelectedCategory(cat);
                       // Auto-select first project in this category if exists
                       const catProjs = projects.filter(p => p.categoryId === cat.id);
@@ -1204,84 +1271,18 @@ export default function App() {
                       }
                       // Immediately smooth scroll down to the workspace section for seamless viewing
                       setTimeout(() => {
-                        document.getElementById("finder-window-section")?.scrollIntoView({ behavior: "smooth" });
+                        const targetSec = document.getElementById("finder-window-section");
+                        if (targetSec) {
+                          targetSec.scrollIntoView({ behavior: "smooth" });
+                        }
                       }, 100);
                     }}
-                    className={`group relative p-5 rounded-xl border transition-all duration-300 cursor-pointer overflow-hidden ${
-                      selectedCategory?.id === cat.id 
-                        ? "bg-[#0c1017] border-sky-400 shadow-[0_0_25px_rgba(56,189,248,0.12)] translate-y-[-4px]" 
-                        : "bg-[#080a0c] hover:bg-[#0c0e12] border-zinc-900 hover:border-sky-500/30 hover:shadow-[0_4px_20px_rgba(56,189,248,0.08)] hover:translate-y-[-3px]"
-                    }`}
-                  >
-                    {/* Folder Corner Accent Line */}
-                    <div className="absolute top-0 right-0 w-8 h-[1px] bg-gradient-to-l from-sky-400/40 to-transparent"></div>
-                    <div className="absolute top-0 right-0 h-8 w-[1px] bg-gradient-to-b from-sky-400/40 to-transparent"></div>
-
-                    <div className="flex items-start justify-between">
-                      {/* Category ID */}
-                      <span className="font-mono text-[10px] font-bold text-sky-500/80 tracking-wider">
-                        CAT // {cat.num}
-                      </span>
-                      
-                      {/* Project count indicator badge */}
-                      <span className="font-mono text-[9px] bg-zinc-950/80 border border-zinc-900 px-2 py-0.5 rounded text-zinc-400 tracking-wider">
-                        {cat.id === "08" ? "PROFILE" : `${projectCount} PROJECTS`}
-                      </span>
-                    </div>
-
-                    {/* Architectural Vector Thumbnail Box */}
-                    <div 
-                      onClick={(e) => {
-                        e.stopPropagation(); // Prevent scroll jump!
-                        setSelectedCategory(cat); // But still select it!
-                        const catProjs = projects.filter(p => p.categoryId === cat.id);
-                        if (catProjs.length > 0) {
-                          setSelectedProject(catProjs[0]);
-                        } else {
-                          setSelectedProject(null);
-                        }
-                      }}
-                      className="w-full h-24 rounded-lg overflow-hidden flex items-center justify-center mt-3 mb-3 relative transition-all duration-300 bg-[#040608]/65 border border-zinc-900/60 cursor-pointer"
-                    >
-                      {cat.image ? (
-                        <img 
-                          src={cat.image} 
-                          alt={cat.title} 
-                          className="w-full h-full object-cover select-none"
-                          referrerPolicy="no-referrer"
-                        />
-                      ) : (
-                        renderCategoryThumbnail(cat.id)
-                      )}
-
-                      {/* Coordinate Overlay */}
-                      <div className="absolute bottom-1 right-2 text-[6px] font-mono text-zinc-600 pointer-events-none">
-                        XYZ: 100.{cat.id} / 60.00
-                      </div>
-                    </div>
-
-                    {/* Thin cyan blue point line */}
-                    <div className="w-full h-[1px] bg-gradient-to-r from-sky-500/5 via-sky-400/40 to-transparent mb-3"></div>
-
-                    {/* Main Category Title Block */}
-                    <div className="flex-1 min-w-0">
-                      <h3 className="font-sans text-sm font-semibold tracking-wide text-zinc-200 group-hover:text-white transition-colors flex items-center gap-1.5">
-                        <span>{cat.title}</span>
-                      </h3>
-                      <p className="text-[11px] text-zinc-500 group-hover:text-zinc-400 transition-colors mt-1 leading-relaxed">
-                        {cat.description}
-                      </p>
-                    </div>
-
-                    {/* Bottom Status bar */}
-                    <div className="mt-4 pt-2.5 border-t border-zinc-900/40 flex items-center justify-between text-[8px] font-mono text-zinc-600 group-hover:text-sky-400/50 transition-colors">
-                      <span>SECURE ARCHIVE</span>
-                      <span className="flex items-center gap-1 font-mono">
-                        <span className="w-1 h-1 rounded-full bg-sky-500 group-hover:animate-ping"></span>
-                        READY
-                      </span>
-                    </div>
-                  </div>
+                    coverImageUrl={coverImageUrls[docId]}
+                    isAdmin={isAdmin}
+                    uploadState={uploadStates[cat.id]}
+                    onUploadImage={(file) => handleCoverImageUpload(cat.id, file)}
+                    renderThumbnail={renderCategoryThumbnail}
+                  />
                 );
               })}
             </div>
