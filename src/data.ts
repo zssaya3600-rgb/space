@@ -27,7 +27,7 @@ export const defaultCategories: Category[] = [
     num: "04", 
     title: "Residential Design", 
     description: "Residential space and interior design layout", 
-    image: "/images/residential_01.png" 
+    image: "/images/pangyo_08.png" 
   },
   { 
     id: "05", 
